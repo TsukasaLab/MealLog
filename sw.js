@@ -1,9 +1,15 @@
-const CACHE_NAME = 'meallog-v016-shell';
+const CACHE_NAME = 'meallog-v017-shell';
 const FALLBACK_PAGE = './index.html';
 
 const PRECACHE = [
   './',
   './index.html',
+  './styles.css',
+  './v003.css',
+  './v004.css',
+  './v005.css',
+  './v006.css',
+  './v009.css',
   './v011.css',
   './assets/night-festival-bg.jpg',
   './manifest.webmanifest',
