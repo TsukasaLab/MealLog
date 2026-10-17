@@ -1,0 +1,657 @@
+/* MealLog Ver.0.19 - closer to the approved festival mock */
+
+:root {
+  --bg-deep: #09061f;
+  --panel-glass: rgba(23, 12, 54, .84);
+  --panel-glass-2: rgba(22, 13, 58, .88);
+  --line-soft: rgba(255,255,255,.14);
+  --text-cream: #fff9ee;
+  --text-soft: #ded1ef;
+  --pink: #ff4f8a;
+  --pink-2: #ff7b77;
+  --orange: #ff9c35;
+  --cyan: #19c7d8;
+}
+
+body {
+  overflow-x: hidden;
+  color: var(--text-cream);
+}
+
+html, body {
+  background-color: var(--bg-deep) !important;
+}
+
+.app-view {
+  width: min(1100px, calc(100% - 28px)) !important;
+  padding-top: 22px !important;
+  padding-bottom: 80px !important;
+  position: relative;
+}
+
+.app-view::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 50% -5%, rgba(255,110,174,.18), transparent 18rem),
+    radial-gradient(circle at 15% 15%, rgba(255,138,61,.15), transparent 18rem),
+    radial-gradient(circle at 85% 22%, rgba(80,131,255,.12), transparent 20rem),
+    radial-gradient(circle at 65% 82%, rgba(255,120,189,.12), transparent 22rem);
+}
+
+.festival-top-blossoms {
+  opacity: .95 !important;
+  height: 120px !important;
+  background:
+    radial-gradient(circle at 6% 46%, #ff83ba 0 10px, transparent 11px),
+    radial-gradient(circle at 9% 22%, #ffacd1 0 13px, transparent 14px),
+    radial-gradient(circle at 12% 54%, #ff7db0 0 8px, transparent 9px),
+    radial-gradient(circle at 16% 29%, #ff9bc5 0 10px, transparent 11px),
+    radial-gradient(circle at 84% 26%, #ff9ac7 0 12px, transparent 13px),
+    radial-gradient(circle at 89% 46%, #ff78ac 0 10px, transparent 11px),
+    radial-gradient(circle at 95% 18%, #ffc0dd 0 13px, transparent 14px),
+    linear-gradient(165deg, transparent 0 10.5%, rgba(102,43,65,.75) 10.7% 11.3%, transparent 11.6% 100%),
+    linear-gradient(15deg, transparent 0 88.4%, rgba(102,43,65,.75) 88.7% 89.3%, transparent 89.6% 100%) !important;
+}
+
+.festival-side-banner {
+  top: 210px !important;
+  width: 70px !important;
+  min-height: 250px !important;
+  opacity: .96 !important;
+  border-radius: 18px !important;
+  background: linear-gradient(180deg, #f44759, #b21635) !important;
+  border: 2px solid rgba(255,219,164,.38) !important;
+}
+
+.topbar,
+.night-dashboard,
+.night-content-shell {
+  width: 100% !important;
+  position: relative;
+  z-index: 4;
+}
+
+.topbar {
+  padding: 16px 20px !important;
+  min-height: 96px !important;
+  border-radius: 34px !important;
+  background: linear-gradient(180deg, rgba(38,13,77,.92), rgba(31,10,60,.92)) !important;
+  border: 1px solid rgba(255,255,255,.16) !important;
+  box-shadow: 0 22px 44px rgba(5,3,18,.42), inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+
+.topbar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, rgba(255,131,186,.08), transparent 22%, transparent 78%, rgba(255,158,62,.08));
+}
+
+.brand {
+  align-items: center !important;
+  gap: 14px !important;
+}
+
+.brand-icon {
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 18px !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,.26), 0 0 0 3px rgba(255,255,255,.08);
+}
+
+.brand strong {
+  font-size: clamp(2rem, 4vw, 3.1rem) !important;
+  color: #fff8df !important;
+  letter-spacing: -.06em !important;
+  text-shadow: 0 4px 20px rgba(0,0,0,.26);
+}
+
+.brand small {
+  margin-top: 5px !important;
+  font-size: .88rem !important;
+  letter-spacing: .02em !important;
+  text-transform: none !important;
+  color: #fff0a6 !important;
+}
+
+.topbar-actions {
+  gap: 12px !important;
+}
+
+.share-top-button,
+.avatar-button {
+  min-height: 50px !important;
+  border-radius: 20px !important;
+  background: rgba(95,70,142,.55) !important;
+}
+
+.compact-add {
+  min-height: 56px !important;
+  padding: 0 28px !important;
+  border-radius: 999px !important;
+  font-size: 1.02rem !important;
+  font-weight: 800 !important;
+  background: linear-gradient(135deg, var(--pink), var(--pink-2)) !important;
+  box-shadow: 0 16px 30px rgba(255,87,131,.28) !important;
+}
+
+.avatar-button {
+  width: 50px !important;
+}
+
+.night-dashboard {
+  margin-top: 16px !important;
+  padding: 26px 24px 20px !important;
+  border-radius: 38px !important;
+  overflow: hidden !important;
+  background:
+    linear-gradient(180deg, rgba(18,12,58,.78), rgba(12,7,40,.78)),
+    rgba(16, 8, 46, .70) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  box-shadow: 0 24px 52px rgba(5,3,26,.46), inset 0 1px 0 rgba(255,255,255,.05) !important;
+  backdrop-filter: blur(18px);
+}
+
+.night-dashboard::before {
+  display: block !important;
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 84% 22%, rgba(255,126,171,.16), transparent 14rem),
+    radial-gradient(circle at 18% 14%, rgba(255,170,92,.08), transparent 15rem),
+    radial-gradient(circle at 50% 90%, rgba(80,121,255,.08), transparent 20rem);
+}
+
+.hero-mascot {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  width: 190px;
+  height: 170px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hero-mascot::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 170px;
+  height: 170px;
+  border-radius: 40px;
+  background: radial-gradient(circle at 50% 35%, rgba(255,129,177,.18), rgba(255,129,177,.05) 55%, transparent 70%);
+}
+
+.hero-mascot-badge {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 108px;
+  height: 108px;
+  border-radius: 32px;
+  padding: 10px;
+  background: linear-gradient(180deg, rgba(255,148,189,.24), rgba(255,98,155,.06));
+  box-shadow: 0 24px 34px rgba(0,0,0,.26), 0 0 0 1px rgba(255,255,255,.08) inset;
+}
+
+.hero-mascot-badge img {
+  width: 100%;
+  height: 100%;
+  border-radius: 28px;
+  object-fit: cover;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,.24));
+}
+
+.dashboard-search-wrap,
+.dashboard-place-section,
+.festival-summary-cards {
+  position: relative;
+  z-index: 3;
+}
+
+.dashboard-search-wrap {
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) 70px !important;
+  gap: 12px !important;
+  width: calc(100% - 220px);
+  margin-bottom: 18px !important;
+  padding-top: 138px;
+}
+
+.dashboard-search {
+  min-height: 74px !important;
+  border-radius: 36px !important;
+  background: rgba(44,27,89,.92) !important;
+  border: 2px solid rgba(255,195,226,.22) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 16px 30px rgba(0,0,0,.20) !important;
+  padding: 0 24px !important;
+}
+
+.dashboard-search > span {
+  font-size: 2.2rem !important;
+  color: #fff9ff !important;
+}
+
+.dashboard-search input {
+  font-size: 1.18rem !important;
+  color: #fff8ff !important;
+}
+
+.dashboard-search input::placeholder {
+  color: #dacbf2 !important;
+}
+
+.dashboard-filter-button {
+  width: 70px !important;
+  height: 74px !important;
+  border-radius: 26px !important;
+  background: rgba(59,40,101,.92) !important;
+  border: 2px solid rgba(255,195,226,.18) !important;
+  font-size: 1.9rem !important;
+}
+
+.dashboard-place-section {
+  margin-top: 0 !important;
+}
+
+.mini-section-row {
+  margin-bottom: 14px !important;
+}
+
+.mini-section-title {
+  font-size: 1.15rem !important;
+  color: #fff7fc !important;
+}
+
+.place-clear-button {
+  min-height: 44px !important;
+  padding: 0 18px !important;
+  border-radius: 999px !important;
+  background: rgba(82,57,124,.55) !important;
+  color: #fff2ff !important;
+  font-weight: 800 !important;
+}
+
+.place-filter-chips {
+  gap: 14px !important;
+}
+
+.place-filter-chip {
+  min-height: 86px !important;
+  border-radius: 24px !important;
+  background: rgba(37,27,82,.94) !important;
+  border: 2px solid rgba(255,255,255,.10) !important;
+  color: #fff9ff !important;
+  font-size: 1.06rem !important;
+  font-weight: 800 !important;
+}
+
+.place-filter-chip.active {
+  background: linear-gradient(180deg, #fff3f7, #ffe5ee) !important;
+  color: #ef3970 !important;
+  border-color: rgba(255,95,148,.72) !important;
+}
+
+.place-filter-chip .chip-icon {
+  font-size: 1.75rem !important;
+}
+
+.festival-summary-cards {
+  margin-top: 20px !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0,1fr)) !important;
+  gap: 16px !important;
+}
+
+.festival-summary-cards .summary-card {
+  min-height: 210px !important;
+  border-radius: 28px !important;
+  padding: 20px 22px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  box-shadow: 0 18px 32px rgba(0,0,0,.20) !important;
+}
+
+.festival-summary-cards .summary-card::before {
+  content: '✿';
+  position: absolute;
+  right: 18px;
+  top: 14px;
+  font-size: 2rem;
+  color: rgba(255,230,240,.54);
+}
+
+.festival-summary-cards .summary-card::after {
+  width: 140px !important;
+  height: 140px !important;
+  right: -34px !important;
+  top: -34px !important;
+}
+
+.summary-card.pink {
+  background: linear-gradient(145deg, #ff3f87 0%, #c81a61 100%) !important;
+}
+
+.summary-card.orange {
+  background: linear-gradient(145deg, #ffa12d 0%, #cf671e 100%) !important;
+}
+
+.summary-card.mint {
+  background: linear-gradient(145deg, #1fd0da 0%, #136dc0 100%) !important;
+}
+
+.summary-card-icon {
+  font-size: 2.4rem !important;
+  margin-bottom: 18px !important;
+}
+
+.summary-label {
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+}
+
+.summary-card strong {
+  margin-top: 10px !important;
+  font-size: clamp(2.2rem, 4vw, 3.5rem) !important;
+  line-height: 1.04 !important;
+}
+
+.summary-card small {
+  margin-top: 10px !important;
+  font-size: .94rem !important;
+  line-height: 1.35 !important;
+}
+
+#summaryTopStore {
+  font-size: clamp(2rem, 3vw, 3rem) !important;
+}
+
+.night-content-shell {
+  margin-top: 18px !important;
+  padding: 26px 20px 22px !important;
+  border-radius: 34px !important;
+  background: linear-gradient(180deg, rgba(22,12,58,.84), rgba(17,10,49,.86)) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  box-shadow: 0 24px 52px rgba(5,3,26,.44) !important;
+}
+
+.section-heading {
+  align-items: center !important;
+  margin-bottom: 18px !important;
+}
+
+.section-heading .eyebrow {
+  color: #ff9fbe !important;
+  font-size: .8rem !important;
+}
+
+.section-heading h2 {
+  font-size: clamp(2rem, 3vw, 2.8rem) !important;
+}
+
+.secondary-button {
+  min-height: 48px !important;
+  padding: 0 18px !important;
+  border-radius: 999px !important;
+  background: rgba(78,58,120,.52) !important;
+  font-weight: 800 !important;
+}
+
+.timeline-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  gap: 16px !important;
+}
+
+.meal-card {
+  grid-template-columns: 44% minmax(0,1fr) !important;
+  min-height: 216px !important;
+  border-radius: 26px !important;
+  background: linear-gradient(180deg, rgba(18,14,53,.97), rgba(14,11,42,.97)) !important;
+  border: 1px solid rgba(255,255,255,.16) !important;
+  box-shadow: 0 18px 30px rgba(0,0,0,.18) !important;
+}
+
+.meal-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(circle at 88% 10%, rgba(255,121,176,.08), transparent 18%);
+}
+
+.meal-cover {
+  min-height: 216px !important;
+}
+
+.meal-cover img {
+  filter: saturate(1.08) contrast(1.04);
+}
+
+.meal-body {
+  padding: 16px 16px 14px !important;
+  gap: 9px !important;
+}
+
+.meal-body h3 {
+  font-size: 1.55rem !important;
+  line-height: 1.2 !important;
+}
+
+.store-inline,
+.place-inline {
+  padding: 0 !important;
+  min-height: auto !important;
+  color: #ebdff8 !important;
+  font-size: 1rem !important;
+}
+
+.meal-stats-row {
+  grid-template-columns: minmax(0,1fr) auto !important;
+  grid-template-areas:
+    'price rating'
+    'date date' !important;
+  gap: 6px 12px !important;
+}
+
+.meal-price-main {
+  grid-area: price;
+  font-size: 1.95rem !important;
+  font-weight: 800 !important;
+}
+
+.meal-rating-main {
+  grid-area: rating;
+  align-self: center;
+  font-size: 1.18rem !important;
+}
+
+.meal-card-date {
+  grid-area: date;
+  font-size: .96rem !important;
+}
+
+.meal-tags {
+  gap: 9px !important;
+}
+
+.meal-tag {
+  min-height: 32px !important;
+  padding: 0 13px !important;
+  font-size: .9rem !important;
+}
+
+.meal-tag.place { background: linear-gradient(135deg,#ff458b,#d32063) !important; }
+.meal-tag.shared { background: linear-gradient(135deg,#f4aa24,#cd7a0d) !important; }
+
+.meal-note {
+  font-size: .92rem !important;
+  -webkit-line-clamp: 2 !important;
+}
+
+.meal-actions {
+  padding-top: 4px;
+}
+
+.view-entry,
+.edit-entry,
+.delete-entry {
+  min-height: 36px !important;
+  border-radius: 12px !important;
+  font-weight: 800 !important;
+}
+
+.view-entry { background: linear-gradient(135deg,var(--pink),var(--pink-2)) !important; }
+
+.empty-state,
+.state-card {
+  min-height: 280px !important;
+  border-radius: 28px !important;
+  background: rgba(33,23,75,.78) !important;
+}
+
+.bottom-cta {
+  margin-top: 18px !important;
+}
+
+.bottom-cta-inner {
+  min-height: 246px !important;
+  padding: 24px 26px !important;
+  grid-template-columns: 112px minmax(0,1fr) 250px !important;
+  gap: 20px !important;
+  border-radius: 28px !important;
+  background:
+    linear-gradient(90deg, rgba(30,12,66,.35), rgba(24,9,53,.46)),
+    url('./assets/night-festival-bg.jpg') center 58% / cover !important;
+  border: 1px solid rgba(255,255,255,.15) !important;
+}
+
+.bottom-cta-mascot img {
+  width: 104px !important;
+  height: 104px !important;
+  border-radius: 28px !important;
+}
+
+.bottom-cta-copy h3 {
+  font-size: clamp(1.75rem, 3vw, 2.4rem) !important;
+  line-height: 1.3 !important;
+}
+
+.bottom-cta-button {
+  min-width: 240px !important;
+  min-height: 62px !important;
+  border-radius: 999px !important;
+  font-size: 1.15rem !important;
+  background: linear-gradient(135deg, var(--pink), var(--pink-2)) !important;
+}
+
+/* Modal buttons */
+.choice-pills label span {
+  min-height: 56px !important;
+  border-radius: 18px !important;
+  background: rgba(255,255,255,.92) !important;
+  color: #736775 !important;
+  border: 2px solid rgba(234,220,234,.88) !important;
+}
+
+.choice-pills input:checked + span {
+  background: linear-gradient(135deg,#fff0f6,#ffddeb) !important;
+  color: #ed3d72 !important;
+  border-color: #ff71a0 !important;
+}
+
+@media (max-width: 1100px) {
+  .festival-side-banner { display: none !important; }
+}
+
+@media (max-width: 900px) {
+  .topbar { min-height: 84px !important; border-radius: 26px !important; padding: 12px 14px !important; }
+  .brand-icon { width: 54px !important; height: 54px !important; }
+  .brand strong { font-size: 2.05rem !important; }
+  .brand small { font-size: .75rem !important; }
+  .share-top-button { display: none !important; }
+  .compact-add { min-height: 46px !important; padding: 0 16px !important; font-size: .92rem !important; }
+  .avatar-button { min-height: 46px !important; width: 46px !important; }
+
+  .night-dashboard { padding: 18px 14px 16px !important; border-radius: 28px !important; }
+  .hero-mascot { width: 132px; height: 110px; top: 18px; right: 10px; }
+  .hero-mascot-badge { width: 78px; height: 78px; border-radius: 24px; top: 0; right: 0; }
+  .dashboard-search-wrap { width: calc(100% - 110px); padding-top: 88px; grid-template-columns: minmax(0,1fr) 56px !important; }
+  .dashboard-search { min-height: 60px !important; border-radius: 24px !important; padding: 0 16px !important; }
+  .dashboard-search > span { font-size: 1.65rem !important; }
+  .dashboard-search input { font-size: 1rem !important; }
+  .dashboard-filter-button { width: 56px !important; height: 60px !important; border-radius: 18px !important; }
+  .place-filter-chips { gap: 10px !important; }
+  .place-filter-chip { min-height: 74px !important; border-radius: 18px !important; gap: 10px !important; font-size: .94rem !important; }
+  .festival-summary-cards { grid-template-columns: repeat(3,minmax(0,1fr)) !important; gap: 10px !important; }
+  .festival-summary-cards .summary-card { min-height: 150px !important; padding: 16px !important; border-radius: 20px !important; }
+  .summary-card-icon { font-size: 1.9rem !important; margin-bottom: 10px !important; }
+  .summary-label { font-size: .84rem !important; }
+  .summary-card strong { font-size: 2rem !important; }
+  .summary-card small { font-size: .76rem !important; }
+  #summaryTopStore { font-size: 1.65rem !important; }
+
+  .night-content-shell { padding: 18px 14px !important; border-radius: 28px !important; }
+  .section-heading h2 { font-size: 2rem !important; }
+  .timeline-grid { gap: 12px !important; }
+  .meal-card { grid-template-columns: 1fr !important; min-height: 0 !important; }
+  .meal-cover { min-height: 180px !important; }
+  .meal-body h3 { font-size: 1.3rem !important; }
+  .meal-price-main { font-size: 1.62rem !important; }
+  .bottom-cta-inner { grid-template-columns: 80px minmax(0,1fr) !important; min-height: 190px !important; padding: 18px !important; }
+  .bottom-cta-mascot img { width: 74px !important; height: 74px !important; border-radius: 20px !important; }
+  .bottom-cta-button { grid-column: 1 / -1; width: 100% !important; min-width: 0 !important; }
+}
+
+@media (max-width: 640px) {
+  .app-view { width: calc(100% - 18px) !important; padding-top: 10px !important; }
+  .topbar { gap: 10px !important; }
+  .brand { gap: 10px !important; }
+  .brand strong { font-size: 1.8rem !important; }
+  .brand small { display: none !important; }
+  .compact-add { padding: 0 12px !important; font-size: .8rem !important; }
+
+  .night-dashboard { padding: 16px 12px 14px !important; }
+  .hero-mascot { width: 98px; height: 88px; top: 14px; right: 6px; }
+  .hero-mascot-badge { width: 62px; height: 62px; padding: 6px; border-radius: 18px; }
+  .dashboard-search-wrap { width: calc(100% - 70px); padding-top: 70px; gap: 8px !important; grid-template-columns: minmax(0,1fr) 48px !important; }
+  .dashboard-search { min-height: 52px !important; border-radius: 20px !important; }
+  .dashboard-filter-button { width: 48px !important; height: 52px !important; border-radius: 16px !important; font-size: 1.2rem !important; }
+  .mini-section-row { gap: 8px !important; }
+  .place-clear-button { padding: 0 12px !important; font-size: .76rem !important; }
+  .place-filter-chips { grid-template-columns: repeat(3,minmax(0,1fr)) !important; gap: 8px !important; }
+  .place-filter-chip { min-height: 64px !important; padding: 0 6px !important; gap: 5px !important; border-radius: 16px !important; font-size: .78rem !important; }
+  .place-filter-chip .chip-icon { font-size: 1.2rem !important; }
+  .festival-summary-cards { grid-template-columns: 1fr !important; }
+  .festival-summary-cards .summary-card { min-height: 108px !important; padding: 15px 16px 15px 64px !important; }
+  .summary-card-icon { position: absolute !important; left: 18px !important; top: 50% !important; transform: translateY(-50%) !important; margin: 0 !important; font-size: 1.65rem !important; }
+  .summary-card strong { font-size: 1.62rem !important; }
+  #summaryTopStore { font-size: 1.45rem !important; }
+  .night-content-shell { padding: 16px 10px !important; }
+  .section-heading { gap: 10px !important; }
+  .section-heading h2 { font-size: 1.7rem !important; }
+  .secondary-button { min-height: 40px !important; padding: 0 14px !important; font-size: .82rem !important; }
+  .timeline-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
+  .meal-cover { min-height: 150px !important; }
+  .meal-body { padding: 12px !important; }
+  .meal-body h3 { font-size: 1.15rem !important; }
+  .store-inline, .place-inline { font-size: .88rem !important; }
+  .meal-price-main { font-size: 1.4rem !important; }
+  .meal-rating-main, .meal-card-date { font-size: .84rem !important; }
+  .meal-tag { min-height: 28px !important; padding: 0 10px !important; font-size: .78rem !important; }
+  .meal-note { font-size: .82rem !important; }
+  .meal-actions { flex-wrap: wrap !important; }
+  .bottom-cta-inner { min-height: 170px !important; grid-template-columns: 70px minmax(0,1fr) !important; }
+  .bottom-cta-copy h3 { font-size: 1.25rem !important; }
+}

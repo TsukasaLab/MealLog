@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#120f2b" />
+  <meta name="theme-color" content="#140b32" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="MealLog" />
@@ -12,15 +12,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./styles.css?v=017" />
-  <link rel="stylesheet" href="./v003.css?v=017" />
-  <link rel="stylesheet" href="./v004.css?v=017" />
-  <link rel="stylesheet" href="./v005.css?v=017" />
-  <link rel="stylesheet" href="./v006.css?v=017" />
-  <link rel="stylesheet" href="./v009.css?v=017" />
-  <link rel="stylesheet" href="./v011.css?v=018" />
-  <link rel="stylesheet" href="./v018.css?v=018" />
-  <link rel="manifest" href="./manifest.webmanifest?v=018" />
+  <link rel="stylesheet" href="./styles.css?v=020" />
+  <link rel="stylesheet" href="./v003.css?v=020" />
+  <link rel="stylesheet" href="./v004.css?v=020" />
+  <link rel="stylesheet" href="./v005.css?v=020" />
+  <link rel="stylesheet" href="./v006.css?v=020" />
+  <link rel="stylesheet" href="./v009.css?v=020" />
+  <link rel="stylesheet" href="./v011.css?v=020" />
+  <link rel="stylesheet" href="./v018.css?v=020" />
+  <link rel="stylesheet" href="./v019.css?v=020" />
+  <link rel="stylesheet" href="./v020.css?v=020" />
+  <link rel="manifest" href="./manifest.webmanifest?v=020" />
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
 </head>
@@ -30,7 +32,7 @@
   <section id="setupView" class="setup-view hidden">
     <div class="setup-card">
       <img class="brand-icon large" src="./icons/icon-192.png" alt="" aria-hidden="true" />
-      <p class="eyebrow">MealLog Ver.0.18</p>
+      <p class="eyebrow">MealLog Ver.0.20</p>
       <h1>Supabaseの接続設定が必要です</h1>
       <p><code>config.js</code> にProject URLとPublishable keyを設定してください。</p>
     </div>
@@ -103,20 +105,24 @@
         <span><strong>MealLog</strong><small>祭りの味を、ずっとそばに</small></span>
       </div>
       <div class="topbar-actions">
-        <button id="shareButtonTop" class="share-top-button" type="button">共有</button>
-        <button id="openUploadTop" class="compact-add" type="button">＋ 食事を記録</button>
-        <button id="profileButton" class="avatar-button" type="button" aria-label="アカウントメニュー"><span id="avatarText">M</span></button>
+        <button id="openUploadTop" class="compact-add" type="button"><span class="compact-add-plus">＋</span><span>食事を記録</span></button>
+        <button id="profileButton" class="avatar-button mascot-avatar" type="button" aria-label="アカウントメニュー"><img src="./icons/icon-192.png" alt="" /><span id="avatarText" class="visually-hidden">M</span></button>
       </div>
       <div id="profileMenu" class="profile-menu hidden">
         <p id="profileEmail"></p>
+        <button id="shareButtonTop" type="button">共有グループ</button>
         <button id="logoutButton" type="button">ログアウト</button>
       </div>
     </header>
 
     <section class="hero hero-dashboard night-dashboard">
+      <div class="hero-mascot" aria-hidden="true">
+        <div class="hero-mascot-badge"><img src="./assets/mascot-hero.png" alt="" /></div>
+      </div>
+
       <div class="dashboard-search-wrap">
         <label class="dashboard-search"><span aria-hidden="true">⌕</span><input id="heroSearchInput" type="search" placeholder="食事・お店・タグで検索…" /></label>
-        <button id="heroRefreshButton" class="dashboard-filter-button" type="button" aria-label="更新">⟲</button>
+        <button id="heroRefreshButton" class="dashboard-filter-button" type="button" aria-label="更新">☷</button>
       </div>
 
       <div class="dashboard-place-section">
@@ -136,7 +142,7 @@
           <span class="summary-card-icon">🍜</span>
           <span class="summary-label">今月の記録</span>
           <strong id="summaryCount">0件</strong>
-          <small id="summaryCountSub">まずは1件記録しよう</small>
+          <small id="summaryCountSub">まずは1件記録</small>
         </article>
         <article class="summary-card orange">
           <span class="summary-card-icon">👛</span>
@@ -147,7 +153,7 @@
         <article class="summary-card mint">
           <span class="summary-card-icon">🏪</span>
           <span class="summary-label">よく行く店</span>
-          <strong id="summaryTopStore">まだなし</strong>
+          <strong id="summaryTopStore">未登録</strong>
           <small id="summaryTopStoreSub">店舗を登録しよう</small>
         </article>
       </div>
@@ -156,7 +162,7 @@
     <section class="content-shell night-content-shell">
       <div class="section-heading">
         <div class="recent-heading-copy"><p class="eyebrow">RECENT MEALS</p><h2><span aria-hidden="true">🍴</span> 最近の食事</h2></div>
-        <div class="view-tools"><input id="searchInput" type="search" hidden /><button id="refreshButton" class="secondary-button" type="button">更新</button></div>
+        <div class="view-tools"><input id="searchInput" type="search" hidden /><button id="refreshButton" class="secondary-button" type="button">すべて見る</button></div>
       </div>
 
       <div id="loadingState" class="state-card hidden"><div class="spinner"></div><p>クラウドから読み込み中…</p></div>
@@ -168,7 +174,7 @@
 
       <section class="bottom-cta" aria-label="記録の案内">
         <div class="bottom-cta-inner">
-          <div class="bottom-cta-mascot" aria-hidden="true"><img src="./icons/icon-192.png" alt="" /></div>
+          <div class="bottom-cta-mascot" aria-hidden="true"><img src="./assets/mascot-bottom.png" alt="" /></div>
           <div class="bottom-cta-copy">
             <p class="eyebrow">COLLECT YOUR MEMORIES</p>
             <h3>食事を記録して<br />思い出をたくさん集めよう！</h3>
@@ -294,15 +300,13 @@
     </article>
   </dialog>
 
-  <script src="./config.js?v=018"></script>
+  <script src="./config.js?v=020"></script>
   <script>
-    // GitHub Pages 側で config.js の反映が遅れたり取得に失敗した場合のフォールバック。
-    // Publishable key はブラウザ利用を前提とした公開用キーです。
     window.MEALLOG_CONFIG = window.MEALLOG_CONFIG || {
       SUPABASE_URL: "https://icgwnxppibsbiciuyvjg.supabase.co",
       SUPABASE_KEY: "sb_publishable_gzC7_Vxo4J0YJ-g-Psw0tw_gY8NF77M"
     };
   </script>
-  <script type="module" src="./app.js?v=018"></script>
+  <script type="module" src="./app.js?v=020"></script>
 </body>
 </html>

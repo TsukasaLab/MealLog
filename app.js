@@ -700,12 +700,14 @@ function renderEntries() {
     const cover = entry.photos?.[0]?.url || '';
     card.className = `meal-card${cover ? '' : ' no-photo'}${entry.share_group_id ? ' is-shared' : ''}`;
 
+    const storeTag = entry.store_name ? `#${escapeHtml(entry.store_name.length > 10 ? entry.store_name.slice(0, 10) + '…' : entry.store_name)}` : '#MealLog';
     card.innerHTML = `
       <div class="meal-cover" data-open="${entry.id}">
         ${cover ? `<img src="${cover}" alt="${escapeHtml(entry.title)}" loading="lazy">` : `<div class="meal-cover-placeholder"><span>🍡</span><small>NO PHOTO</small></div>`}
         <span class="photo-count">${(entry.photos || []).length}枚</span>
       </div>
       <div class="meal-body">
+        <button class="meal-kebab" type="button" data-open="${entry.id}" aria-label="詳細を開く">⋮</button>
         <h3>${escapeHtml(entry.title)}</h3>
         <div class="meal-location-line">
           ${entry.store_name ? `<button class="store-inline store-history-button" type="button">📍 ${escapeHtml(entry.store_name)}</button>` : `<span class="place-inline">📍 ${escapeHtml(placeLabel(entry.place_type))}</span>`}
@@ -717,6 +719,7 @@ function renderEntries() {
         </div>
         <div class="meal-tags">
           <span class="meal-tag place">#${escapeHtml(placeLabel(entry.place_type))}</span>
+          <span class="meal-tag storetag">${storeTag}</span>
           ${entry.share_group_id ? `<span class="meal-tag shared">#${escapeHtml(groupName(entry.share_group_id))}</span>` : ''}
         </div>
         ${entry.note ? `<div class="meal-note">${escapeHtml(entry.note)}</div>` : ''}
@@ -1029,7 +1032,14 @@ els.searchInput.addEventListener('input', () => {
   if (els.heroSearchInput && els.heroSearchInput.value !== els.searchInput.value) els.heroSearchInput.value = els.searchInput.value;
   renderEntries();
 });
-els.refreshButton.addEventListener('click', loadEntries);
+els.refreshButton.addEventListener('click', () => {
+  activePlaceFilter = 'all';
+  els.searchInput.value = '';
+  if (els.heroSearchInput) els.heroSearchInput.value = '';
+  document.querySelectorAll('[data-place-filter]').forEach(chip => chip.classList.remove('active'));
+  if (els.clearPlaceFilterButton) els.clearPlaceFilterButton.classList.add('active');
+  renderEntries();
+});
 if (els.heroSearchInput) {
   els.heroSearchInput.addEventListener('input', () => {
     els.searchInput.value = els.heroSearchInput.value;
@@ -1043,7 +1053,7 @@ bootstrap();
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
-      const registration = await navigator.serviceWorker.register('./sw.js?v=018');
+      const registration = await navigator.serviceWorker.register('./sw.js?v=020');
       await registration.update();
     } catch (error) {
       console.error('ServiceWorker registration failed', error);

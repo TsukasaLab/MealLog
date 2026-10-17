@@ -1,0 +1,297 @@
+/* MealLog Ver.0.20 - approved mock matching pass */
+
+/* Header floats over the festival background, closer to the mock */
+.topbar {
+  background: linear-gradient(180deg, rgba(18,8,46,.72), rgba(18,8,46,.34)) !important;
+  border-color: rgba(255,255,255,.08) !important;
+  box-shadow: 0 18px 40px rgba(6,2,24,.22) !important;
+  backdrop-filter: blur(12px) saturate(125%) !important;
+}
+
+.topbar-actions {
+  position: relative;
+  z-index: 2;
+}
+
+.compact-add {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.compact-add-plus {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  background: rgba(255,255,255,.96);
+  color: #ff4e88;
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.mascot-avatar {
+  padding: 3px !important;
+  overflow: hidden;
+  background: rgba(73,45,108,.78) !important;
+}
+
+.mascot-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+/* Hero mascot from the approved mock */
+.hero-mascot {
+  top: 10px !important;
+  right: 8px !important;
+  width: 260px !important;
+  height: 205px !important;
+  overflow: hidden;
+  border-radius: 0 28px 0 42px;
+  opacity: .98;
+}
+
+.hero-mascot::before {
+  display: none !important;
+}
+
+.hero-mascot-badge {
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.hero-mascot-badge img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  object-fit: cover !important;
+  object-position: 52% 48% !important;
+  filter: saturate(1.05) contrast(1.02) !important;
+  -webkit-mask-image: linear-gradient(to left, #000 74%, transparent 100%), linear-gradient(to top, #000 78%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to left, #000 74%, transparent 100%), linear-gradient(to top, #000 78%, transparent 100%);
+  mask-composite: intersect;
+}
+
+.dashboard-search-wrap {
+  width: calc(100% - 190px) !important;
+  padding-top: 122px !important;
+}
+
+/* Make search / place / stats feel like one continuous app dashboard */
+.night-dashboard {
+  background: linear-gradient(180deg, rgba(18,10,54,.66), rgba(12,7,42,.78)) !important;
+}
+
+.place-filter-chip {
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.place-filter-chip:active { transform: scale(.98); }
+
+/* Summary cards closer to the image: larger pictograms, less tiny helper text */
+.summary-card-icon {
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,.18));
+}
+.summary-card small {
+  max-width: 92%;
+}
+
+/* Recent meal cards. Keep a fixed 2-column rhythm independent of count. */
+.timeline-grid {
+  grid-auto-rows: 1fr !important;
+}
+
+.meal-card {
+  position: relative !important;
+  cursor: default;
+}
+
+.meal-body {
+  position: relative;
+  padding-right: 36px !important;
+}
+
+.meal-kebab {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  width: 28px;
+  height: 34px;
+  border: 0;
+  background: transparent;
+  color: #f2e9ff;
+  font-size: 1.55rem;
+  line-height: 1;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.meal-kebab:hover { background: rgba(255,255,255,.08); }
+
+.meal-tag.storetag {
+  background: linear-gradient(135deg,#e99a15,#bf650b) !important;
+  color: #fff !important;
+}
+
+.meal-actions {
+  display: none !important;
+}
+
+.meal-note {
+  margin-top: auto;
+}
+
+/* Bottom banner uses the mascot crop from the approved mock */
+.bottom-cta-inner {
+  position: relative !important;
+  grid-template-columns: 250px minmax(0,1fr) 260px !important;
+  overflow: hidden !important;
+}
+
+.bottom-cta-mascot {
+  width: 250px;
+  height: 190px;
+  align-self: end;
+  overflow: visible;
+}
+
+.bottom-cta-mascot img {
+  width: 250px !important;
+  height: 190px !important;
+  border-radius: 0 !important;
+  object-fit: cover !important;
+  object-position: 46% 48% !important;
+  box-shadow: none !important;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 60%, transparent 94%);
+  mask-image: radial-gradient(ellipse at center, #000 60%, transparent 94%);
+  filter: saturate(1.08) contrast(1.02);
+}
+
+.bottom-cta-copy {
+  position: relative;
+  z-index: 2;
+}
+.bottom-cta-copy .eyebrow { display: none; }
+
+.bottom-cta-button {
+  position: relative;
+  z-index: 2;
+}
+
+/* Stronger petals on the margins, but never blocking controls */
+.sakura-petal-layer .p1 { left: -2% !important; top: 7% !important; }
+.sakura-petal-layer .p2 { right: 1% !important; top: 15% !important; }
+.sakura-petal-layer .p3 { left: 3% !important; top: 28% !important; }
+.sakura-petal-layer .p4 { right: 2% !important; top: 32% !important; }
+.sakura-petal-layer .p5 { left: 5% !important; top: 48% !important; }
+.sakura-petal-layer .p6 { right: 4% !important; top: 56% !important; }
+.sakura-petal-layer .p7 { left: 1% !important; top: 70% !important; }
+.sakura-petal-layer .p8 { right: 6% !important; top: 76% !important; }
+
+/* Desktop width around the approved composition */
+@media (min-width: 1101px) {
+  .app-view { width: min(1060px, calc(100% - 190px)) !important; }
+  .festival-side-banner-left { left: calc(50% - 610px) !important; }
+  .festival-side-banner-right { right: calc(50% - 610px) !important; }
+}
+
+/* The mock is phone-first and still uses two meal cards side by side. */
+@media (max-width: 900px) {
+  .app-view { width: calc(100% - 14px) !important; }
+  .topbar { min-height: 82px !important; padding: 10px 12px !important; }
+  .brand-icon { width: 52px !important; height: 52px !important; }
+  .brand strong { font-size: 1.9rem !important; }
+  .compact-add { min-height: 46px !important; padding: 0 12px !important; gap: 7px !important; }
+  .compact-add-plus { width: 29px; height: 29px; font-size: 1.25rem; }
+  .avatar-button { width: 46px !important; height: 46px !important; min-height: 46px !important; }
+
+  .night-dashboard { border-radius: 26px !important; padding: 14px 12px 14px !important; }
+  .hero-mascot { width: 150px !important; height: 126px !important; top: 8px !important; right: 2px !important; }
+  .dashboard-search-wrap { width: calc(100% - 92px) !important; padding-top: 86px !important; }
+  .dashboard-search { min-height: 56px !important; border-radius: 23px !important; }
+  .dashboard-filter-button { width: 54px !important; height: 56px !important; }
+
+  .place-filter-chip { min-height: 70px !important; }
+  .festival-summary-cards { grid-template-columns: repeat(3,minmax(0,1fr)) !important; }
+  .festival-summary-cards .summary-card { min-height: 142px !important; }
+
+  .night-content-shell { padding: 16px 10px 18px !important; }
+  .timeline-grid { grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 10px !important; }
+  .meal-card { grid-template-columns: 46% minmax(0,1fr) !important; min-height: 188px !important; }
+  .meal-cover { min-height: 188px !important; }
+  .meal-body { padding: 11px 30px 10px 11px !important; gap: 5px !important; }
+  .meal-body h3 { font-size: 1.02rem !important; -webkit-line-clamp: 2 !important; }
+  .store-inline, .place-inline { font-size: .76rem !important; }
+  .meal-price-main { font-size: 1.25rem !important; }
+  .meal-rating-main { font-size: .82rem !important; }
+  .meal-card-date { font-size: .72rem !important; }
+  .meal-tags { gap: 5px !important; }
+  .meal-tag { min-height: 24px !important; padding: 0 7px !important; font-size: .66rem !important; }
+  .meal-note { font-size: .72rem !important; -webkit-line-clamp: 1 !important; }
+  .photo-count { font-size: .65rem !important; padding: 3px 6px !important; }
+
+  .bottom-cta-inner { grid-template-columns: 120px minmax(0,1fr) !important; min-height: 190px !important; padding: 16px !important; }
+  .bottom-cta-mascot { width: 120px; height: 140px; }
+  .bottom-cta-mascot img { width: 140px !important; height: 140px !important; }
+  .bottom-cta-copy h3 { font-size: 1.2rem !important; }
+  .bottom-cta-button { grid-column: 1 / -1; width: 100% !important; min-width: 0 !important; }
+}
+
+@media (max-width: 520px) {
+  .topbar { border-radius: 22px !important; }
+  .brand strong { font-size: 1.55rem !important; }
+  .compact-add span:last-child { font-size: .72rem; }
+  .hero-mascot { width: 122px !important; height: 104px !important; }
+  .dashboard-search-wrap { width: calc(100% - 68px) !important; padding-top: 72px !important; gap: 6px !important; grid-template-columns: minmax(0,1fr) 46px !important; }
+  .dashboard-search { min-height: 50px !important; padding: 0 13px !important; }
+  .dashboard-search input { font-size: .86rem !important; }
+  .dashboard-filter-button { width: 46px !important; height: 50px !important; }
+
+  .mini-section-title { font-size: .9rem !important; }
+  .place-clear-button { min-height: 34px !important; padding: 0 10px !important; font-size: .68rem !important; }
+  .place-filter-chips { gap: 6px !important; }
+  .place-filter-chip { min-height: 62px !important; padding: 0 4px !important; gap: 4px !important; font-size: .72rem !important; }
+  .place-filter-chip .chip-icon { font-size: 1.1rem !important; }
+
+  .festival-summary-cards { gap: 6px !important; }
+  .festival-summary-cards .summary-card { min-height: 118px !important; padding: 12px 10px !important; border-radius: 18px !important; }
+  .summary-card-icon { font-size: 1.35rem !important; margin-bottom: 6px !important; }
+  .summary-label { font-size: .66rem !important; }
+  .summary-card strong { font-size: 1.45rem !important; }
+  .summary-card small { font-size: .58rem !important; }
+  #summaryTopStore { font-size: 1.15rem !important; }
+
+  .section-heading h2 { font-size: 1.35rem !important; }
+  .secondary-button { min-height: 36px !important; padding: 0 11px !important; font-size: .7rem !important; }
+
+  /* Keep two columns even on narrow phones; cards become compact like the mock */
+  .timeline-grid { grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 7px !important; }
+  .meal-card { grid-template-columns: 1fr !important; min-height: 0 !important; border-radius: 16px !important; }
+  .meal-cover { min-height: 112px !important; max-height: 112px !important; }
+  .meal-body { padding: 8px 24px 8px 8px !important; gap: 3px !important; }
+  .meal-kebab { right: 3px; top: 4px; width: 22px; height: 26px; font-size: 1.15rem; }
+  .meal-body h3 { font-size: .86rem !important; line-height: 1.2 !important; }
+  .store-inline, .place-inline { font-size: .64rem !important; max-width: 100%; }
+  .meal-stats-row { gap: 2px 6px !important; }
+  .meal-price-main { font-size: 1rem !important; }
+  .meal-rating-main { font-size: .68rem !important; }
+  .meal-card-date { font-size: .61rem !important; }
+  .meal-tags { gap: 3px !important; }
+  .meal-tag { min-height: 20px !important; padding: 0 5px !important; font-size: .55rem !important; }
+  .meal-note { display: none !important; }
+  .photo-count { right: 5px !important; bottom: 5px !important; }
+
+  .bottom-cta-inner { grid-template-columns: 88px minmax(0,1fr) !important; min-height: 160px !important; padding: 12px !important; }
+  .bottom-cta-mascot { width: 88px; height: 110px; }
+  .bottom-cta-mascot img { width: 108px !important; height: 110px !important; }
+  .bottom-cta-copy h3 { font-size: 1rem !important; }
+  .bottom-cta-button { min-height: 50px !important; font-size: .9rem !important; }
+}
