@@ -4,8 +4,8 @@
   "description": "お祭り感のあるポップな食事記録アプリ",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#fff5ef",
-  "theme_color": "#ff5b7d",
+  "background_color": "#120f2b",
+  "theme_color": "#120f2b",
   "icons": [
     {
       "src": "./icons/icon-192.png",

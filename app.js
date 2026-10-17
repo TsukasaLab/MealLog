@@ -28,6 +28,7 @@ const els = {
   summaryCount: $('summaryCount'), summaryCountSub: $('summaryCountSub'),
   summarySpend: $('summarySpend'), summarySpendSub: $('summarySpendSub'),
   summaryTopStore: $('summaryTopStore'), summaryTopStoreSub: $('summaryTopStoreSub'),
+  heroSearchInput: $('heroSearchInput'), heroRefreshButton: $('heroRefreshButton'),
   toast: $('toast')
 };
 
@@ -991,13 +992,28 @@ async function deleteEntry(id) {
   }
 }
 
-els.searchInput.addEventListener('input', renderEntries);
+els.searchInput.addEventListener('input', () => {
+  if (els.heroSearchInput && els.heroSearchInput.value !== els.searchInput.value) els.heroSearchInput.value = els.searchInput.value;
+  renderEntries();
+});
 els.refreshButton.addEventListener('click', loadEntries);
+if (els.heroSearchInput) {
+  els.heroSearchInput.addEventListener('input', () => {
+    els.searchInput.value = els.heroSearchInput.value;
+    renderEntries();
+  });
+}
+if (els.heroRefreshButton) els.heroRefreshButton.addEventListener('click', loadEntries);
 
 bootstrap();
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(error => console.error('ServiceWorker registration failed', error));
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('./sw.js?v=011');
+      await registration.update();
+    } catch (error) {
+      console.error('ServiceWorker registration failed', error);
+    }
   });
 }

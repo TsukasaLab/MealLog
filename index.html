@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#ff5b7d" />
+  <meta name="theme-color" content="#120f2b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="MealLog" />
@@ -12,13 +12,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./styles.css?v=006" />
-  <link rel="stylesheet" href="./v003.css?v=006" />
-  <link rel="stylesheet" href="./v004.css?v=006" />
-  <link rel="stylesheet" href="./v005.css?v=006" />
-  <link rel="stylesheet" href="./v006.css?v=009" />
-  <link rel="stylesheet" href="./v009.css?v=009" />
-  <link rel="manifest" href="./manifest.webmanifest?v=009" />
+  <link rel="stylesheet" href="./styles.css?v=011" />
+  <link rel="stylesheet" href="./v003.css?v=011" />
+  <link rel="stylesheet" href="./v004.css?v=011" />
+  <link rel="stylesheet" href="./v005.css?v=011" />
+  <link rel="stylesheet" href="./v006.css?v=011" />
+  <link rel="stylesheet" href="./v009.css?v=011" />
+  <link rel="stylesheet" href="./v011.css?v=011" />
+  <link rel="manifest" href="./manifest.webmanifest?v=011" />
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
 </head>
@@ -27,8 +28,8 @@
 
   <section id="setupView" class="setup-view hidden">
     <div class="setup-card">
-      <div class="brand-mark large" aria-hidden="true">M</div>
-      <p class="eyebrow">MealLog Ver.0.09</p>
+      <img class="brand-icon large" src="./icons/icon-192.png" alt="" aria-hidden="true" />
+      <p class="eyebrow">MealLog Ver.0.11</p>
       <h1>Supabaseの接続設定が必要です</h1>
       <p><code>config.js</code> にProject URLとPublishable keyを設定してください。</p>
     </div>
@@ -38,7 +39,7 @@
     <div class="auth-shell">
       <div class="auth-visual">
         <div class="auth-visual-content">
-          <div class="brand-mark large">M</div>
+          <img class="brand-icon large" src="./icons/icon-192.png" alt="MealLog" />
           <p class="eyebrow light">MATSURI FOOD MEMORY</p>
           <div class="festival-mini-badges"><span>わくわく記録</span><span>写真で残す</span><span>毎日の一皿</span></div>
           <h1>今日のごはんを、<br />お祭り気分で残そう。</h1>
@@ -49,7 +50,7 @@
 
       <div class="auth-panel">
         <div class="auth-panel-inner">
-          <div class="mobile-brand"><span class="brand-mark">M</span><strong>MealLog</strong></div>
+          <div class="mobile-brand"><img class="brand-icon" src="./icons/icon-192.png" alt="" /><strong>MealLog</strong></div>
           <p class="eyebrow">WELCOME</p>
           <h2 id="authTitle">おかえりなさい</h2>
           <p id="authLead" class="subtle">Googleアカウントですぐにログインできます</p>
@@ -88,8 +89,8 @@
   <main id="appView" class="app-view hidden">
     <header class="topbar">
       <a class="brand" href="#home" aria-label="MealLog ホーム">
-        <span class="brand-mark">M</span>
-        <span><strong>MealLog</strong><small>Festival Food Memory</small></span>
+        <img class="brand-icon" src="./icons/icon-192.png" alt="" />
+        <span><strong>MealLog</strong><small>FESTIVAL FOOD MEMORY</small></span>
       </a>
       <div class="topbar-actions">
         <button id="shareButtonTop" class="share-top-button" type="button">共有</button>
@@ -102,49 +103,44 @@
       </div>
     </header>
 
-    <section class="hero hero-dashboard">
-      <div class="dashboard-main">
-        <div class="dashboard-heading">
-          <p class="eyebrow">MATSURI FOOD DIARY</p>
-          <h1>記録をサッと、見返しをパッと。</h1>
-          <p>CarLogみたいに使いやすく、写真・店舗・価格までまとめて残せる食事記録アプリ。</p>
-        </div>
-        <div class="summary-cards">
-          <article class="summary-card pink">
-            <span class="summary-label">今月の記録</span>
-            <strong id="summaryCount">0件</strong>
-            <small id="summaryCountSub">まずは1件記録しよう</small>
-          </article>
-          <article class="summary-card orange">
-            <span class="summary-label">今月の食費</span>
-            <strong id="summarySpend">¥0</strong>
-            <small id="summarySpendSub">価格を入れると集計できます</small>
-          </article>
-          <article class="summary-card mint">
-            <span class="summary-label">よく行く店</span>
-            <strong id="summaryTopStore">まだなし</strong>
-            <small id="summaryTopStoreSub">店舗記録なし</small>
-          </article>
-        </div>
+    <section class="hero hero-dashboard night-dashboard">
+      <div class="dashboard-search-wrap">
+        <label class="dashboard-search"><span aria-hidden="true">⌕</span><input id="heroSearchInput" type="search" placeholder="料理名・店舗名・メモを検索" /></label>
+        <button id="heroRefreshButton" class="dashboard-filter-button" type="button" aria-label="更新">↻</button>
       </div>
-      <div class="hero-side dashboard-side">
-        <button id="openUploadHero" class="hero-add" type="button">
-          <span class="hero-add-icon">＋</span>
-          <span><strong>食事を記録</strong><small>写真・場所・価格・評価を追加</small></span>
+
+      <div class="summary-cards festival-summary-cards">
+        <article class="summary-card pink">
+          <span class="summary-card-icon">🍜</span>
+          <span class="summary-label">今月の記録</span>
+          <strong id="summaryCount">0件</strong>
+          <small id="summaryCountSub">まずは1件記録しよう</small>
+        </article>
+        <article class="summary-card orange">
+          <span class="summary-card-icon">👛</span>
+          <span class="summary-label">今月の食費</span>
+          <strong id="summarySpend">¥0</strong>
+          <small id="summarySpendSub">価格を入れると集計できます</small>
+        </article>
+        <article class="summary-card mint">
+          <span class="summary-card-icon">🏮</span>
+          <span class="summary-label">よく行く店</span>
+          <strong id="summaryTopStore">まだなし</strong>
+          <small id="summaryTopStoreSub">店舗記録なし</small>
+        </article>
+        <button id="openUploadHero" class="summary-card add-meal-card" type="button">
+          <span class="add-meal-plus">＋</span>
+          <span class="summary-label">食事を記録</span>
+          <strong>追加する</strong>
+          <small>写真・店舗・価格・評価</small>
         </button>
-        <div class="quick-chip-grid" aria-hidden="true">
-          <span class="quick-chip pink">🍧 写真</span>
-          <span class="quick-chip orange">🏮 店舗</span>
-          <span class="quick-chip yellow">💴 価格</span>
-          <span class="quick-chip mint">⭐ 評価</span>
-        </div>
       </div>
     </section>
 
-    <section class="content-shell">
+    <section class="content-shell night-content-shell">
       <div class="section-heading">
-        <div><p class="eyebrow">TIMELINE</p><h2>食事の記録</h2></div>
-        <div class="view-tools">
+        <div><p class="eyebrow">RECENT MEALS</p><h2>最近の食事</h2></div>
+        <div class="view-tools desktop-search-tools">
           <label class="search-box"><span aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="料理名・店舗名・メモを検索" /></label>
           <button id="refreshButton" class="secondary-button" type="button">更新</button>
         </div>
@@ -281,7 +277,7 @@
     </article>
   </dialog>
 
-  <script src="./config.js?v=009"></script>
-  <script type="module" src="./app.js?v=009"></script>
+  <script src="./config.js?v=011"></script>
+  <script type="module" src="./app.js?v=011"></script>
 </body>
 </html>
