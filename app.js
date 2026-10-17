@@ -88,6 +88,10 @@ function formatDate(iso) {
   }).format(new Date(iso));
 }
 
+function formatCardDate(iso) {
+  return new Intl.DateTimeFormat('ja-JP', { month:'numeric', day:'numeric' }).format(new Date(iso)).replace('/', '月') + '日';
+}
+
 function formatYen(value) {
   if (value === null || value === undefined || value === '' || Number.isNaN(Number(value))) return '－';
   return `¥${new Intl.NumberFormat('ja-JP').format(Number(value))}`;
@@ -702,21 +706,22 @@ function renderEntries() {
         <span class="photo-count">${(entry.photos || []).length}枚</span>
       </div>
       <div class="meal-body">
-        <div class="meal-meta"><span>${escapeHtml(formatDate(entry.eaten_at))}</span></div>
         <h3>${escapeHtml(entry.title)}</h3>
-        <div class="meal-subline">
-          ${entry.store_name ? `<button class="store-inline store-history-button" type="button">📍 ${escapeHtml(entry.store_name)}</button>` : `<span class="place-inline">${escapeHtml(placeLabel(entry.place_type))}</span>`}
-          ${entry.price_yen !== null && entry.price_yen !== undefined && entry.price_yen !== '' ? `<span class="price-inline">${escapeHtml(formatYen(entry.price_yen))}</span>` : ''}
+        <div class="meal-location-line">
+          ${entry.store_name ? `<button class="store-inline store-history-button" type="button">📍 ${escapeHtml(entry.store_name)}</button>` : `<span class="place-inline">📍 ${escapeHtml(placeLabel(entry.place_type))}</span>`}
+        </div>
+        <div class="meal-stats-row">
+          <strong class="meal-price-main">${entry.price_yen !== null && entry.price_yen !== undefined && entry.price_yen !== '' ? escapeHtml(formatYen(entry.price_yen)) : '価格未登録'}</strong>
+          <span class="meal-rating-main">★ ${entry.rating ? escapeHtml(entry.rating) : '－'}</span>
+          <time class="meal-card-date">${escapeHtml(formatCardDate(entry.eaten_at))}</time>
         </div>
         <div class="meal-tags">
-          <span class="meal-tag place">${escapeHtml(placeLabel(entry.place_type))}</span>
-          ${entry.rating ? `<span class="meal-tag rating">★ ${entry.rating}</span>` : `<span class="meal-tag rating soft">未評価</span>`}
-          ${entry.share_group_id ? `<span class="meal-tag shared">👥 ${escapeHtml(groupName(entry.share_group_id))}</span>` : ''}
-          ${entry.share_group_id && !canEditEntry(entry) ? `<span class="meal-tag shared-by">メンバーの記録</span>` : ''}
+          <span class="meal-tag place">#${escapeHtml(placeLabel(entry.place_type))}</span>
+          ${entry.share_group_id ? `<span class="meal-tag shared">#${escapeHtml(groupName(entry.share_group_id))}</span>` : ''}
         </div>
-        <div class="meal-note">${escapeHtml(entry.note || 'メモはありません')}</div>
+        ${entry.note ? `<div class="meal-note">${escapeHtml(entry.note)}</div>` : ''}
         <div class="meal-actions">
-          <button class="view-entry" type="button" data-open="${entry.id}">見る</button>
+          <button class="view-entry" type="button" data-open="${entry.id}">詳細</button>
           ${canEditEntry(entry) ? `<div class="meal-action-right">
             <button class="edit-entry" type="button">編集</button>
             <button class="delete-entry" type="button" data-delete="${entry.id}">削除</button>
@@ -1038,7 +1043,7 @@ bootstrap();
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
-      const registration = await navigator.serviceWorker.register('./sw.js?v=017');
+      const registration = await navigator.serviceWorker.register('./sw.js?v=018');
       await registration.update();
     } catch (error) {
       console.error('ServiceWorker registration failed', error);

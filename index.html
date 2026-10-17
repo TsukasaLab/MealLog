@@ -18,8 +18,9 @@
   <link rel="stylesheet" href="./v005.css?v=017" />
   <link rel="stylesheet" href="./v006.css?v=017" />
   <link rel="stylesheet" href="./v009.css?v=017" />
-  <link rel="stylesheet" href="./v011.css?v=017" />
-  <link rel="manifest" href="./manifest.webmanifest?v=017" />
+  <link rel="stylesheet" href="./v011.css?v=018" />
+  <link rel="stylesheet" href="./v018.css?v=018" />
+  <link rel="manifest" href="./manifest.webmanifest?v=018" />
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
 </head>
@@ -29,7 +30,7 @@
   <section id="setupView" class="setup-view hidden">
     <div class="setup-card">
       <img class="brand-icon large" src="./icons/icon-192.png" alt="" aria-hidden="true" />
-      <p class="eyebrow">MealLog Ver.0.17</p>
+      <p class="eyebrow">MealLog Ver.0.18</p>
       <h1>Supabaseの接続設定が必要です</h1>
       <p><code>config.js</code> にProject URLとPublishable keyを設定してください。</p>
     </div>
@@ -92,15 +93,18 @@
       <span class="petal p5"></span><span class="petal p6"></span><span class="petal p7"></span><span class="petal p8"></span>
       <span class="petal p9"></span><span class="petal p10"></span><span class="petal p11"></span><span class="petal p12"></span>
     </div>
+    <div class="festival-top-blossoms" aria-hidden="true"></div>
+    <div class="festival-side-banner festival-side-banner-left" aria-hidden="true"><span>たこ焼き</span></div>
+    <div class="festival-side-banner festival-side-banner-right" aria-hidden="true"><span>ラーメン</span></div>
 
     <header class="topbar">
       <div class="brand" aria-label="MealLog">
         <img class="brand-icon" src="./icons/icon-192.png" alt="MealLog" />
-        <span><strong>MealLog</strong><small>FESTIVAL FOOD MEMORY</small></span>
+        <span><strong>MealLog</strong><small>祭りの味を、ずっとそばに</small></span>
       </div>
       <div class="topbar-actions">
         <button id="shareButtonTop" class="share-top-button" type="button">共有</button>
-        <button id="openUploadTop" class="compact-add" type="button">＋ 記録する</button>
+        <button id="openUploadTop" class="compact-add" type="button">＋ 食事を記録</button>
         <button id="profileButton" class="avatar-button" type="button" aria-label="アカウントメニュー"><span id="avatarText">M</span></button>
       </div>
       <div id="profileMenu" class="profile-menu hidden">
@@ -151,7 +155,7 @@
 
     <section class="content-shell night-content-shell">
       <div class="section-heading">
-        <div><p class="eyebrow">RECENT MEALS</p><h2>最近の食事</h2></div>
+        <div class="recent-heading-copy"><p class="eyebrow">RECENT MEALS</p><h2><span aria-hidden="true">🍴</span> 最近の食事</h2></div>
         <div class="view-tools"><input id="searchInput" type="search" hidden /><button id="refreshButton" class="secondary-button" type="button">更新</button></div>
       </div>
 
@@ -164,10 +168,10 @@
 
       <section class="bottom-cta" aria-label="記録の案内">
         <div class="bottom-cta-inner">
+          <div class="bottom-cta-mascot" aria-hidden="true"><img src="./icons/icon-192.png" alt="" /></div>
           <div class="bottom-cta-copy">
             <p class="eyebrow">COLLECT YOUR MEMORIES</p>
-            <h3>食事を記録して
-思い出をたくさん集めよう！</h3>
+            <h3>食事を記録して<br />思い出をたくさん集めよう！</h3>
           </div>
           <button id="openUploadBottom" class="primary-button bottom-cta-button" type="button">＋　食事を記録</button>
         </div>
@@ -290,7 +294,7 @@
     </article>
   </dialog>
 
-  <script src="./config.js?v=017"></script>
+  <script src="./config.js?v=018"></script>
   <script>
     // GitHub Pages 側で config.js の反映が遅れたり取得に失敗した場合のフォールバック。
     // Publishable key はブラウザ利用を前提とした公開用キーです。
@@ -299,6 +303,6 @@
       SUPABASE_KEY: "sb_publishable_gzC7_Vxo4J0YJ-g-Psw0tw_gY8NF77M"
     };
   </script>
-  <script type="module" src="./app.js?v=017"></script>
+  <script type="module" src="./app.js?v=018"></script>
 </body>
 </html>
