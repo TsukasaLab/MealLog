@@ -18,9 +18,13 @@ const els = {
   previewArea: $('previewArea'), previewGrid: $('previewGrid'), clearPhotos: $('clearPhotos'), photoEditHint: $('photoEditHint'),
   mealTitle: $('mealTitle'), mealNote: $('mealNote'), eatenAt: $('eatenAt'), saveMeal: $('saveMeal'), uploadStatus: $('uploadStatus'),
   storeNameField: $('storeNameField'), storeName: $('storeName'), ratingStars: $('ratingStars'), ratingInput: $('ratingInput'), clearRating: $('clearRating'),
+  shareGroupSelect: $('shareGroupSelect'),
   timeline: $('timeline'), loadingState: $('loadingState'), emptyState: $('emptyState'), searchInput: $('searchInput'), refreshButton: $('refreshButton'),
   detailDialog: $('detailDialog'), detailContent: $('detailContent'), closeDetail: $('closeDetail'),
   storeHistoryDialog: $('storeHistoryDialog'), storeHistoryContent: $('storeHistoryContent'), closeStoreHistory: $('closeStoreHistory'),
+  shareButtonTop: $('shareButtonTop'), shareNav: $('shareNav'), shareDialog: $('shareDialog'), closeShare: $('closeShare'),
+  shareGroupsList: $('shareGroupsList'), createGroupForm: $('createGroupForm'), newGroupName: $('newGroupName'),
+  joinGroupForm: $('joinGroupForm'), inviteCodeInput: $('inviteCodeInput'), shareMessage: $('shareMessage'),
   toast: $('toast')
 };
 
@@ -28,6 +32,8 @@ let authMode = 'login';
 let currentUser = null;
 let selectedFiles = [];
 let entriesCache = [];
+let shareGroups = [];
+let shareMemberCounts = new Map();
 let toastTimer = null;
 
 let editingEntryId = null;
@@ -101,6 +107,44 @@ function normalizeStoreName(value) {
   return String(value || '').trim().toLocaleLowerCase('ja-JP');
 }
 
+function groupName(groupId) {
+  return shareGroups.find(group => group.id === groupId)?.name || '共有';
+}
+
+function canEditEntry(entry) {
+  return Boolean(currentUser && entry?.user_id === currentUser.id);
+}
+
+function renderShareGroupSelect(selectedId = '') {
+  if (!els.shareGroupSelect) return;
+  els.shareGroupSelect.innerHTML = '<option value="">自分だけ</option>' +
+    shareGroups.map(group => `<option value="${group.id}">${escapeHtml(group.name)}</option>`).join('');
+  els.shareGroupSelect.value = selectedId || '';
+}
+
+async function loadShareGroups() {
+  shareGroups = [];
+  shareMemberCounts = new Map();
+  if (!currentUser) return;
+
+  const { data: groups, error: groupError } = await supabase
+    .from('share_groups')
+    .select('id,name,invite_code,owner_id,created_at')
+    .order('created_at', { ascending:true });
+  if (groupError) throw groupError;
+
+  const { data: members, error: memberError } = await supabase
+    .from('share_group_members')
+    .select('group_id,user_id,role');
+  if (memberError) throw memberError;
+
+  shareGroups = groups || [];
+  (members || []).forEach(member => {
+    shareMemberCounts.set(member.group_id, (shareMemberCounts.get(member.group_id) || 0) + 1);
+  });
+  renderShareGroupSelect();
+}
+
 async function bootstrap() {
   if (!isConfigured) {
     show(els.setupView);
@@ -126,6 +170,12 @@ async function applySession(session) {
   els.profileEmail.textContent = displayName ? `${displayName}\n${email}` : email;
   els.profileEmail.style.whiteSpace = 'pre-line';
   els.avatarText.textContent = (displayName || email).slice(0, 1).toUpperCase();
+  try {
+    await loadShareGroups();
+  } catch (error) {
+    console.error('共有グループ読み込みエラー', error);
+    toast('共有グループの読み込みに失敗しました');
+  }
   await loadEntries();
 }
 
@@ -219,6 +269,7 @@ function resetFormState() {
   document.querySelector('input[name="placeType"][value="home"]').checked = true;
   updateStoreField();
   setRating(0);
+  renderShareGroupSelect('');
   els.eatenAt.value = nowForDatetimeLocal();
   els.uploadStatus.textContent = '';
   els.photoEditHint.classList.add('hidden');
@@ -237,6 +288,10 @@ function openUpload() {
 function openEdit(id) {
   const entry = entriesCache.find(e => e.id === id);
   if (!entry) return;
+  if (!canEditEntry(entry)) {
+    toast('共有メンバーの記録は編集できません');
+    return;
+  }
 
   editingEntryId = id;
   selectedFiles = [];
@@ -253,6 +308,7 @@ function openEdit(id) {
   updateStoreField();
   if ((entry.place_type || 'home') !== 'home') els.storeName.value = entry.store_name || '';
   setRating(entry.rating || 0);
+  renderShareGroupSelect(entry.share_group_id || '');
 
   els.formEyebrow.textContent = 'EDIT ENTRY';
   els.formTitle.textContent = '記録を編集';
@@ -336,6 +392,7 @@ function formValues() {
     placeType,
     storeName: placeType === 'home' ? '' : els.storeName.value.trim(),
     rating: els.ratingInput.value ? Number(els.ratingInput.value) : null,
+    shareGroupId: els.shareGroupSelect.value || null,
     eatenAt: new Date(els.eatenAt.value).toISOString()
   };
 }
@@ -388,7 +445,8 @@ async function createEntry(values) {
       eaten_at: values.eatenAt,
       place_type: values.placeType,
       store_name: values.storeName,
-      rating: values.rating
+      rating: values.rating,
+      share_group_id: values.shareGroupId
     });
     if (entryError) throw entryError;
 
@@ -418,7 +476,8 @@ async function editEntry(values) {
         eaten_at: values.eatenAt,
         place_type: values.placeType,
         store_name: values.storeName,
-        rating: values.rating
+        rating: values.rating,
+        share_group_id: values.shareGroupId
       })
       .eq('id', entry.id);
 
@@ -496,7 +555,7 @@ async function loadEntries() {
   try {
     const { data, error } = await supabase
       .from('meal_entries')
-      .select('id,title,note,eaten_at,created_at,place_type,store_name,rating,meal_photos(id,storage_path,original_name)')
+      .select('id,user_id,title,note,eaten_at,created_at,place_type,store_name,rating,share_group_id,meal_photos(id,storage_path,original_name)')
       .order('eaten_at', { ascending:false });
     if (error) throw error;
 
@@ -515,6 +574,7 @@ async function loadEntries() {
       place_type: entry.place_type || 'home',
       store_name: entry.store_name || '',
       rating: entry.rating ?? null,
+      share_group_id: entry.share_group_id || null,
       photos: (entry.meal_photos || []).map(p => ({ ...p, url:signedMap.get(p.storage_path) })).filter(p => p.url)
     }));
     renderEntries();
@@ -529,7 +589,7 @@ async function loadEntries() {
 function renderEntries() {
   const q = els.searchInput.value.trim().toLowerCase();
   const rows = entriesCache.filter(entry => {
-    const haystack = `${entry.title} ${entry.note || ''} ${entry.store_name || ''} ${placeLabel(entry.place_type)}`.toLowerCase();
+    const haystack = `${entry.title} ${entry.note || ''} ${entry.store_name || ''} ${placeLabel(entry.place_type)} ${entry.share_group_id ? groupName(entry.share_group_id) : ''}`.toLowerCase();
     return !q || haystack.includes(q);
   });
 
@@ -558,20 +618,22 @@ function renderEntries() {
           <span class="meal-tag place">${escapeHtml(placeLabel(entry.place_type))}</span>
           ${entry.store_name ? `<button class="meal-tag store store-history-button" type="button">${escapeHtml(entry.store_name)}</button>` : ''}
           ${entry.rating ? `<span class="meal-tag rating">★ ${entry.rating}</span>` : ''}
+          ${entry.share_group_id ? `<span class="meal-tag shared">共有・${escapeHtml(groupName(entry.share_group_id))}</span>` : ''}
+          ${entry.share_group_id && !canEditEntry(entry) ? `<span class="meal-tag shared-by">メンバーの記録</span>` : ''}
         </div>
         <div class="meal-note">${escapeHtml(entry.note || 'メモはありません')}</div>
         <div class="meal-actions">
           <button class="view-entry" type="button" data-open="${entry.id}">見る</button>
-          <div class="meal-action-right">
+          ${canEditEntry(entry) ? `<div class="meal-action-right">
             <button class="edit-entry" type="button">編集</button>
             <button class="delete-entry" type="button" data-delete="${entry.id}">削除</button>
-          </div>
+          </div>` : '<span class="shared-readonly">閲覧のみ</span>'}
         </div>
       </div>`;
 
     card.querySelectorAll('[data-open]').forEach(btn => btn.addEventListener('click', () => openDetail(entry.id)));
-    card.querySelector('.edit-entry').addEventListener('click', () => openEdit(entry.id));
-    card.querySelector('[data-delete]').addEventListener('click', () => deleteEntry(entry.id));
+    card.querySelector('.edit-entry')?.addEventListener('click', () => openEdit(entry.id));
+    card.querySelector('[data-delete]')?.addEventListener('click', () => deleteEntry(entry.id));
 
     const storeButton = card.querySelector('.store-history-button');
     if (storeButton) {
@@ -592,7 +654,9 @@ function openDetail(id) {
   const images = entry.photos.slice(0, 5).map(p => `<img src="${p.url}" alt="${escapeHtml(entry.title)}">`).join('');
   const tags = [
     `<span class="meal-tag place">${escapeHtml(placeLabel(entry.place_type))}</span>`,
-    entry.rating ? `<span class="meal-tag rating">★ ${entry.rating}</span>` : ''
+    entry.rating ? `<span class="meal-tag rating">★ ${entry.rating}</span>` : '',
+    entry.share_group_id ? `<span class="meal-tag shared">共有・${escapeHtml(groupName(entry.share_group_id))}</span>` : '',
+    entry.share_group_id && !canEditEntry(entry) ? `<span class="meal-tag shared-by">メンバーの記録</span>` : ''
   ].join('');
 
   els.detailContent.innerHTML = `
@@ -608,10 +672,10 @@ function openDetail(id) {
           <span class="store-detail-arrow">履歴を見る ›</span>
         </button>` : ''}
       <div class="detail-note">${escapeHtml(entry.note || 'メモはありません')}</div>
-      <div class="detail-actions-v004">
+      ${canEditEntry(entry) ? `<div class="detail-actions-v004">
         <button class="detail-edit" type="button">この記録を編集</button>
         <button class="detail-delete" type="button">この記録を削除</button>
-      </div>
+      </div>` : '<div class="shared-detail-note">この記録は共有メンバーの記録なので閲覧のみです。</div>'}
     </div>`;
 
   const storeButton = els.detailContent.querySelector('.store-detail-button');
@@ -622,8 +686,8 @@ function openDetail(id) {
     });
   }
 
-  els.detailContent.querySelector('.detail-edit').addEventListener('click', () => openEdit(id));
-  els.detailContent.querySelector('.detail-delete').addEventListener('click', async () => {
+  els.detailContent.querySelector('.detail-edit')?.addEventListener('click', () => openEdit(id));
+  els.detailContent.querySelector('.detail-delete')?.addEventListener('click', async () => {
     els.detailDialog.close();
     await deleteEntry(id);
   });
@@ -681,9 +745,161 @@ function openStoreHistory(storeName) {
 
 els.closeStoreHistory.addEventListener('click', () => els.storeHistoryDialog.close());
 
+function renderShareGroups() {
+  if (!shareGroups.length) {
+    els.shareGroupsList.innerHTML = `
+      <div class="share-empty">
+        <strong>まだ共有グループがありません</strong>
+        <p>まずグループを作るか、家族からもらった招待コードで参加してください。</p>
+      </div>`;
+    return;
+  }
+
+  els.shareGroupsList.innerHTML = shareGroups.map(group => {
+    const isOwner = group.owner_id === currentUser.id;
+    const count = shareMemberCounts.get(group.id) || 1;
+    return `
+      <section class="share-group-card" data-group-id="${group.id}">
+        <div class="share-group-main">
+          <div>
+            <span class="share-role">${isOwner ? '管理者' : 'メンバー'}</span>
+            <h3>${escapeHtml(group.name)}</h3>
+            <p>${count}人で共有中</p>
+          </div>
+          <span class="share-group-icon">◇</span>
+        </div>
+        ${isOwner ? `
+          <div class="invite-code-box">
+            <span>招待コード</span>
+            <strong>${escapeHtml(group.invite_code)}</strong>
+            <button type="button" data-copy-code="${escapeHtml(group.invite_code)}">コピー</button>
+          </div>
+          <button class="share-danger-button" type="button" data-delete-group="${group.id}">グループを削除</button>
+        ` : `
+          <button class="share-leave-button" type="button" data-leave-group="${group.id}">グループから退出</button>
+        `}
+      </section>`;
+  }).join('');
+
+  els.shareGroupsList.querySelectorAll('[data-copy-code]').forEach(button => {
+    button.addEventListener('click', async () => {
+      const code = button.dataset.copyCode || '';
+      try {
+        await navigator.clipboard.writeText(code);
+        toast('招待コードをコピーしました');
+      } catch {
+        window.prompt('この招待コードをコピーしてください', code);
+      }
+    });
+  });
+
+  els.shareGroupsList.querySelectorAll('[data-delete-group]').forEach(button => {
+    button.addEventListener('click', async () => {
+      const group = shareGroups.find(item => item.id === button.dataset.deleteGroup);
+      if (!group) return;
+      if (!confirm(`共有グループ「${group.name}」を削除しますか？\n共有していた食事記録は各登録者の「自分だけ」に戻ります。`)) return;
+
+      els.shareMessage.textContent = 'グループを削除中…';
+      const { error } = await supabase.from('share_groups').delete().eq('id', group.id);
+      if (error) {
+        els.shareMessage.textContent = `削除できませんでした：${error.message}`;
+        return;
+      }
+
+      await loadShareGroups();
+      await loadEntries();
+      renderShareGroups();
+      els.shareMessage.textContent = 'グループを削除しました。';
+    });
+  });
+
+  els.shareGroupsList.querySelectorAll('[data-leave-group]').forEach(button => {
+    button.addEventListener('click', async () => {
+      const group = shareGroups.find(item => item.id === button.dataset.leaveGroup);
+      if (!group) return;
+      if (!confirm(`共有グループ「${group.name}」から退出しますか？`)) return;
+
+      els.shareMessage.textContent = 'グループから退出中…';
+      const { error } = await supabase.rpc('leave_share_group', { p_group_id: group.id });
+      if (error) {
+        els.shareMessage.textContent = `退出できませんでした：${error.message}`;
+        return;
+      }
+
+      await loadShareGroups();
+      await loadEntries();
+      renderShareGroups();
+      els.shareMessage.textContent = 'グループから退出しました。';
+    });
+  });
+}
+
+async function openShareDialog() {
+  els.shareMessage.textContent = '';
+  try {
+    await loadShareGroups();
+    renderShareGroups();
+  } catch (error) {
+    console.error(error);
+    els.shareMessage.textContent = `共有情報を読み込めませんでした：${error.message || ''}`;
+  }
+  els.shareDialog.showModal();
+}
+
+els.shareButtonTop.addEventListener('click', openShareDialog);
+els.shareNav.addEventListener('click', openShareDialog);
+els.closeShare.addEventListener('click', () => els.shareDialog.close());
+
+els.createGroupForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const name = els.newGroupName.value.trim();
+  if (!name) return;
+
+  els.shareMessage.textContent = 'グループを作成中…';
+  const { error } = await supabase.from('share_groups').insert({
+    owner_id: currentUser.id,
+    name
+  });
+
+  if (error) {
+    els.shareMessage.textContent = `作成できませんでした：${error.message}`;
+    return;
+  }
+
+  els.newGroupName.value = '';
+  await loadShareGroups();
+  renderShareGroups();
+  els.shareMessage.textContent = '共有グループを作成しました。招待コードを家族に伝えてください。';
+});
+
+els.joinGroupForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const code = els.inviteCodeInput.value.trim().toUpperCase();
+  if (!code) return;
+
+  els.shareMessage.textContent = 'グループに参加中…';
+  const { error } = await supabase.rpc('join_share_group', { p_invite_code: code });
+
+  if (error) {
+    els.shareMessage.textContent = `参加できませんでした：招待コードを確認してください。`;
+    console.error(error);
+    return;
+  }
+
+  els.inviteCodeInput.value = '';
+  await loadShareGroups();
+  await loadEntries();
+  renderShareGroups();
+  els.shareMessage.textContent = '共有グループに参加しました。';
+});
+
 async function deleteEntry(id) {
   const entry = entriesCache.find(e => e.id === id);
   if (!entry) return;
+  if (!canEditEntry(entry)) {
+    toast('共有メンバーの記録は削除できません');
+    return;
+  }
   if (!confirm(`「${entry.title}」を削除しますか？\n写真もクラウドから削除されます。`)) return;
 
   try {
