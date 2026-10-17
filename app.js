@@ -1,8 +1,12 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-const cfg = window.MEALLOG_CONFIG || {};
+const DEFAULT_CONFIG = {
+  SUPABASE_URL: 'https://icgwnxppibsbiciuyvjg.supabase.co',
+  SUPABASE_KEY: 'sb_publishable_gzC7_Vxo4J0YJ-g-Psw0tw_gY8NF77M'
+};
+const cfg = { ...DEFAULT_CONFIG, ...(window.MEALLOG_CONFIG || {}) };
 const isConfigured = Boolean(cfg.SUPABASE_URL && cfg.SUPABASE_KEY);
-const supabase = isConfigured ? createClient(cfg.SUPABASE_URL, cfg.SUPABASE_KEY) : null;
+const supabase = createClient(cfg.SUPABASE_URL, cfg.SUPABASE_KEY);
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -171,7 +175,7 @@ async function loadShareGroups() {
 async function bootstrap() {
   if (!isConfigured) {
     show(els.setupView);
-    return;
+    return; // fallback only; normally not reached because app.js has built-in config
   }
 
   const { data: { session } } = await supabase.auth.getSession();
@@ -1034,7 +1038,7 @@ bootstrap();
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
-      const registration = await navigator.serviceWorker.register('./sw.js?v=015');
+      const registration = await navigator.serviceWorker.register('./sw.js?v=016');
       await registration.update();
     } catch (error) {
       console.error('ServiceWorker registration failed', error);
