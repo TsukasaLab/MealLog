@@ -12,14 +12,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./styles.css?v=011" />
-  <link rel="stylesheet" href="./v003.css?v=011" />
-  <link rel="stylesheet" href="./v004.css?v=011" />
-  <link rel="stylesheet" href="./v005.css?v=011" />
-  <link rel="stylesheet" href="./v006.css?v=011" />
-  <link rel="stylesheet" href="./v009.css?v=011" />
-  <link rel="stylesheet" href="./v011.css?v=011" />
-  <link rel="manifest" href="./manifest.webmanifest?v=011" />
+  <link rel="stylesheet" href="./v011.css?v=014" />
+  <link rel="manifest" href="./manifest.webmanifest?v=014" />
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
 </head>
@@ -29,7 +23,7 @@
   <section id="setupView" class="setup-view hidden">
     <div class="setup-card">
       <img class="brand-icon large" src="./icons/icon-192.png" alt="" aria-hidden="true" />
-      <p class="eyebrow">MealLog Ver.0.11</p>
+      <p class="eyebrow">MealLog Ver.0.14</p>
       <h1>Supabaseの接続設定が必要です</h1>
       <p><code>config.js</code> にProject URLとPublishable keyを設定してください。</p>
     </div>
@@ -87,11 +81,17 @@
   </section>
 
   <main id="appView" class="app-view hidden">
+    <div class="sakura-petal-layer" aria-hidden="true">
+      <span class="petal p1"></span><span class="petal p2"></span><span class="petal p3"></span><span class="petal p4"></span>
+      <span class="petal p5"></span><span class="petal p6"></span><span class="petal p7"></span><span class="petal p8"></span>
+      <span class="petal p9"></span><span class="petal p10"></span><span class="petal p11"></span><span class="petal p12"></span>
+    </div>
+
     <header class="topbar">
-      <a class="brand" href="#home" aria-label="MealLog ホーム">
-        <img class="brand-icon" src="./icons/icon-192.png" alt="" />
+      <div class="brand" aria-label="MealLog">
+        <img class="brand-icon" src="./icons/icon-192.png" alt="MealLog" />
         <span><strong>MealLog</strong><small>FESTIVAL FOOD MEMORY</small></span>
-      </a>
+      </div>
       <div class="topbar-actions">
         <button id="shareButtonTop" class="share-top-button" type="button">共有</button>
         <button id="openUploadTop" class="compact-add" type="button">＋ 記録する</button>
@@ -105,8 +105,20 @@
 
     <section class="hero hero-dashboard night-dashboard">
       <div class="dashboard-search-wrap">
-        <label class="dashboard-search"><span aria-hidden="true">⌕</span><input id="heroSearchInput" type="search" placeholder="料理名・店舗名・メモを検索" /></label>
-        <button id="heroRefreshButton" class="dashboard-filter-button" type="button" aria-label="更新">↻</button>
+        <label class="dashboard-search"><span aria-hidden="true">⌕</span><input id="heroSearchInput" type="search" placeholder="食事・お店・タグで検索…" /></label>
+        <button id="heroRefreshButton" class="dashboard-filter-button" type="button" aria-label="更新">⟲</button>
+      </div>
+
+      <div class="dashboard-place-section">
+        <div class="mini-section-row">
+          <p class="mini-section-title">食べた場所</p>
+          <button id="clearPlaceFilterButton" class="place-clear-button active" type="button">すべて見る</button>
+        </div>
+        <div class="place-filter-chips" role="group" aria-label="記録の絞り込み">
+          <button class="place-filter-chip" type="button" data-place-filter="home"><span class="chip-icon">🏠</span><span>自宅</span></button>
+          <button class="place-filter-chip" type="button" data-place-filter="dineout"><span class="chip-icon">🍽️</span><span>外食</span></button>
+          <button class="place-filter-chip" type="button" data-place-filter="takeout"><span class="chip-icon">👜</span><span>テイクアウト</span></button>
+        </div>
       </div>
 
       <div class="summary-cards festival-summary-cards">
@@ -120,30 +132,21 @@
           <span class="summary-card-icon">👛</span>
           <span class="summary-label">今月の食費</span>
           <strong id="summarySpend">¥0</strong>
-          <small id="summarySpendSub">価格を入れると集計できます</small>
+          <small id="summarySpendSub">価格入力で自動集計</small>
         </article>
         <article class="summary-card mint">
-          <span class="summary-card-icon">🏮</span>
+          <span class="summary-card-icon">🏪</span>
           <span class="summary-label">よく行く店</span>
           <strong id="summaryTopStore">まだなし</strong>
-          <small id="summaryTopStoreSub">店舗記録なし</small>
+          <small id="summaryTopStoreSub">店舗を登録しよう</small>
         </article>
-        <button id="openUploadHero" class="summary-card add-meal-card" type="button">
-          <span class="add-meal-plus">＋</span>
-          <span class="summary-label">食事を記録</span>
-          <strong>追加する</strong>
-          <small>写真・店舗・価格・評価</small>
-        </button>
       </div>
     </section>
 
     <section class="content-shell night-content-shell">
       <div class="section-heading">
         <div><p class="eyebrow">RECENT MEALS</p><h2>最近の食事</h2></div>
-        <div class="view-tools desktop-search-tools">
-          <label class="search-box"><span aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="料理名・店舗名・メモを検索" /></label>
-          <button id="refreshButton" class="secondary-button" type="button">更新</button>
-        </div>
+        <div class="view-tools"><input id="searchInput" type="search" hidden /><button id="refreshButton" class="secondary-button" type="button">更新</button></div>
       </div>
 
       <div id="loadingState" class="state-card hidden"><div class="spinner"></div><p>クラウドから読み込み中…</p></div>
@@ -152,14 +155,18 @@
         <button id="openUploadEmpty" class="primary-button small" type="button">食事を記録</button>
       </div>
       <div id="timeline" class="timeline-grid"></div>
-    </section>
 
-    <nav class="bottom-nav" aria-label="メインメニュー">
-      <button class="active" type="button"><span>⌂</span><small>ホーム</small></button>
-      <button id="openUploadNav" class="nav-add" type="button"><span>＋</span><small>記録</small></button>
-      <button id="shareNav" type="button"><span>◇</span><small>共有</small></button>
-      <button id="accountNav" type="button"><span>◎</span><small>アカウント</small></button>
-    </nav>
+      <section class="bottom-cta" aria-label="記録の案内">
+        <div class="bottom-cta-inner">
+          <div class="bottom-cta-copy">
+            <p class="eyebrow">COLLECT YOUR MEMORIES</p>
+            <h3>食事を記録して
+思い出をたくさん集めよう！</h3>
+          </div>
+          <button id="openUploadBottom" class="primary-button bottom-cta-button" type="button">＋　食事を記録</button>
+        </div>
+      </section>
+    </section>
   </main>
 
   <dialog id="uploadDialog" class="modal">
@@ -277,7 +284,7 @@
     </article>
   </dialog>
 
-  <script src="./config.js?v=011"></script>
-  <script type="module" src="./app.js?v=011"></script>
+  <script src="./config.js?v=014"></script>
+  <script type="module" src="./app.js?v=014"></script>
 </body>
 </html>

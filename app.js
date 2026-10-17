@@ -11,7 +11,7 @@ const els = {
   authTitle: $('authTitle'), authLead: $('authLead'), authSubmit: $('authSubmit'), authMessage: $('authMessage'),
   switchAuthMode: $('switchAuthMode'), togglePassword: $('togglePassword'), googleLoginButton: $('googleLoginButton'),
   profileButton: $('profileButton'), profileMenu: $('profileMenu'), profileEmail: $('profileEmail'), avatarText: $('avatarText'), logoutButton: $('logoutButton'),
-  openUploadTop: $('openUploadTop'), openUploadHero: $('openUploadHero'), openUploadEmpty: $('openUploadEmpty'), openUploadNav: $('openUploadNav'),
+  openUploadTop: $('openUploadTop'), openUploadHero: $('openUploadHero'), openUploadEmpty: $('openUploadEmpty'), openUploadBottom: $('openUploadBottom'), openUploadNav: $('openUploadNav'),
   accountNav: $('accountNav'), uploadDialog: $('uploadDialog'), closeUpload: $('closeUpload'),
   formEyebrow: $('formEyebrow'), formTitle: $('formTitle'),
   mealForm: $('mealForm'), cameraButton: $('cameraButton'), libraryButton: $('libraryButton'), cameraInput: $('cameraInput'), libraryInput: $('libraryInput'),
@@ -28,7 +28,7 @@ const els = {
   summaryCount: $('summaryCount'), summaryCountSub: $('summaryCountSub'),
   summarySpend: $('summarySpend'), summarySpendSub: $('summarySpendSub'),
   summaryTopStore: $('summaryTopStore'), summaryTopStoreSub: $('summaryTopStoreSub'),
-  heroSearchInput: $('heroSearchInput'), heroRefreshButton: $('heroRefreshButton'),
+  heroSearchInput: $('heroSearchInput'), heroRefreshButton: $('heroRefreshButton'), clearPlaceFilterButton: $('clearPlaceFilterButton'),
   toast: $('toast')
 };
 
@@ -41,6 +41,7 @@ let shareMemberCounts = new Map();
 let toastTimer = null;
 let supportsPriceColumn = true;
 let priceSchemaHintShown = false;
+let activePlaceFilter = 'all';
 
 let editingEntryId = null;
 let editingExistingPhotos = [];
@@ -56,6 +57,12 @@ function toast(message) {
   els.toast.textContent = message;
   els.toast.classList.add('show');
   toastTimer = setTimeout(() => els.toast.classList.remove('show'), 2600);
+}
+
+function toggleProfileMenu(force) {
+  const willOpen = typeof force === 'boolean' ? force : els.profileMenu.classList.contains('hidden');
+  els.profileMenu.classList.toggle('hidden', !willOpen);
+  els.profileButton.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
 }
 
 function escapeHtml(value = '') {
@@ -266,14 +273,14 @@ els.logoutButton.addEventListener('click', async () => {
   toast('ログアウトしました');
 });
 
-els.profileButton.addEventListener('click', e => {
+els.profileButton?.addEventListener('click', e => {
   e.stopPropagation();
-  els.profileMenu.classList.toggle('hidden');
+  toggleProfileMenu();
 });
-els.accountNav.addEventListener('click', () => els.profileMenu.classList.toggle('hidden'));
+els.accountNav?.addEventListener('click', () => toggleProfileMenu());
 document.addEventListener('click', e => {
   if (!els.profileMenu.classList.contains('hidden') && !els.profileMenu.contains(e.target) && !els.profileButton.contains(e.target)) {
-    els.profileMenu.classList.add('hidden');
+    toggleProfileMenu(false);
   }
 });
 
@@ -339,7 +346,20 @@ function openEdit(id) {
   els.uploadDialog.showModal();
 }
 
-[els.openUploadTop, els.openUploadHero, els.openUploadEmpty, els.openUploadNav].forEach(btn => btn?.addEventListener('click', openUpload));
+[els.openUploadTop, els.openUploadHero, els.openUploadEmpty, els.openUploadBottom, els.openUploadNav].forEach(btn => btn?.addEventListener('click', openUpload));
+document.querySelectorAll('[data-place-filter]').forEach(btn => btn.addEventListener('click', () => {
+  activePlaceFilter = btn.dataset.placeFilter || 'all';
+  document.querySelectorAll('[data-place-filter]').forEach(chip => chip.classList.toggle('active', chip === btn));
+  if (els.clearPlaceFilterButton) els.clearPlaceFilterButton.classList.remove('active');
+  renderEntries();
+}));
+
+els.clearPlaceFilterButton?.addEventListener('click', () => {
+  activePlaceFilter = 'all';
+  document.querySelectorAll('[data-place-filter]').forEach(chip => chip.classList.remove('active'));
+  els.clearPlaceFilterButton.classList.add('active');
+  renderEntries();
+});
 els.closeUpload.addEventListener('click', () => els.uploadDialog.close());
 els.cameraButton.addEventListener('click', () => els.cameraInput.click());
 els.libraryButton.addEventListener('click', () => els.libraryInput.click());
@@ -640,26 +660,30 @@ function renderDashboardSummary() {
 
   if (els.summaryCount) {
     els.summaryCount.textContent = `${monthRows.length}件`;
-    els.summaryCountSub.textContent = monthRows.length ? `外食・テイクアウト ${dineoutRows.length}件` : 'まずは1件記録しよう';
+    els.summaryCountSub.textContent = monthRows.length ? `外食・テイクアウト ${dineoutRows.length}件` : 'まずは1件記録';
     els.summarySpend.textContent = supportsPriceColumn ? formatYen(totalSpend) : '－';
-    els.summarySpendSub.textContent = supportsPriceColumn ? (pricedRows.length ? `${pricedRows.length}件の価格を集計` : '価格を入れると集計できます') : 'SQL更新で価格集計が有効になります';
-    els.summaryTopStore.textContent = topStore ? topStore[0] : 'まだなし';
-    els.summaryTopStoreSub.textContent = topStore ? `${topStore[1]}回 記録` : '店舗記録なし';
+    els.summarySpendSub.textContent = supportsPriceColumn ? (pricedRows.length ? `${pricedRows.length}件の価格を集計` : '価格入力で自動集計') : 'SQL更新で価格集計が有効になります';
+    els.summaryTopStore.textContent = topStore ? topStore[0] : '未登録';
+    els.summaryTopStoreSub.textContent = topStore ? `${topStore[1]}回 記録` : '店舗を登録しよう';
   }
 }
 
+
 function renderEntries() {
-  const q = els.searchInput.value.trim().toLowerCase();
+  const q = (els.searchInput.value || '').trim().toLowerCase();
   const rows = entriesCache.filter(entry => {
     const haystack = `${entry.title} ${entry.note || ''} ${entry.store_name || ''} ${placeLabel(entry.place_type)} ${entry.share_group_id ? groupName(entry.share_group_id) : ''}`.toLowerCase();
-    return !q || haystack.includes(q);
+    const matchesSearch = !q || haystack.includes(q);
+    const matchesPlace = activePlaceFilter === 'all' || (entry.place_type || 'home') === activePlaceFilter;
+    return matchesSearch && matchesPlace;
   });
 
-  els.emptyState.classList.toggle('hidden', entriesCache.length !== 0 || q !== '');
+  els.emptyState.classList.toggle('hidden', entriesCache.length !== 0 || q !== '' || activePlaceFilter !== 'all');
   els.timeline.innerHTML = '';
 
-  if (!rows.length && q) {
-    els.timeline.innerHTML = `<div class="state-card"><p>「${escapeHtml(q)}」に一致する記録はありません。</p></div>`;
+  if (!rows.length && (q || activePlaceFilter !== 'all')) {
+    const filterLabel = activePlaceFilter !== 'all' ? ` / ${placeLabel(activePlaceFilter)}` : '';
+    els.timeline.innerHTML = `<div class="state-card"><p>「${escapeHtml(q || '条件')}」${filterLabel} に一致する記録はありません。</p></div>`;
     return;
   }
 
@@ -671,7 +695,7 @@ function renderEntries() {
     card.innerHTML = `
       <div class="meal-cover" data-open="${entry.id}">
         ${cover ? `<img src="${cover}" alt="${escapeHtml(entry.title)}" loading="lazy">` : `<div class="meal-cover-placeholder"><span>🍡</span><small>NO PHOTO</small></div>`}
-        <span class="photo-count">${entry.photos.length}枚</span>
+        <span class="photo-count">${(entry.photos || []).length}枚</span>
       </div>
       <div class="meal-body">
         <div class="meal-meta"><span>${escapeHtml(formatDate(entry.eaten_at))}</span></div>
@@ -920,9 +944,9 @@ async function openShareDialog() {
   els.shareDialog.showModal();
 }
 
-els.shareButtonTop.addEventListener('click', openShareDialog);
-els.shareNav.addEventListener('click', openShareDialog);
-els.closeShare.addEventListener('click', () => els.shareDialog.close());
+els.shareButtonTop?.addEventListener('click', openShareDialog);
+els.shareNav?.addEventListener('click', openShareDialog);
+els.closeShare?.addEventListener('click', () => els.shareDialog.close());
 
 els.createGroupForm.addEventListener('submit', async event => {
   event.preventDefault();
@@ -1010,7 +1034,7 @@ bootstrap();
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
-      const registration = await navigator.serviceWorker.register('./sw.js?v=011');
+      const registration = await navigator.serviceWorker.register('./sw.js?v=013');
       await registration.update();
     } catch (error) {
       console.error('ServiceWorker registration failed', error);
