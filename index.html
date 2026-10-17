@@ -9,8 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./styles.css?v=003" />
-  <link rel="stylesheet" href="./v003.css?v=003" />
+  <link rel="stylesheet" href="./styles.css?v=004" />
+  <link rel="stylesheet" href="./v003.css?v=004" />
+  <link rel="stylesheet" href="./v004.css?v=004" />
 </head>
 <body>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -18,7 +19,7 @@
   <section id="setupView" class="setup-view hidden">
     <div class="setup-card">
       <div class="brand-mark large" aria-hidden="true">M</div>
-      <p class="eyebrow">MealLog Ver.0.03</p>
+      <p class="eyebrow">MealLog Ver.0.04</p>
       <h1>Supabaseの接続設定が必要です</h1>
       <p><code>config.js</code> にProject URLとPublishable keyを設定してください。</p>
     </div>
@@ -129,7 +130,7 @@
   <dialog id="uploadDialog" class="modal">
     <form id="mealForm" method="dialog" class="modal-card">
       <div class="modal-header">
-        <div><p class="eyebrow">NEW ENTRY</p><h2>食事を記録</h2></div>
+        <div><p id="formEyebrow" class="eyebrow">NEW ENTRY</p><h2 id="formTitle">食事を記録</h2></div>
         <button id="closeUpload" class="icon-button" type="button" aria-label="閉じる">×</button>
       </div>
 
@@ -141,8 +142,9 @@
       </div>
 
       <div id="previewArea" class="preview-area hidden">
-        <div class="preview-heading"><span>選択した写真</span><button id="clearPhotos" type="button">すべて外す</button></div>
+        <div class="preview-heading"><span>写真</span><button id="clearPhotos" type="button">すべて外す</button></div>
         <div id="previewGrid" class="preview-grid"></div>
+        <p id="photoEditHint" class="photo-edit-hint hidden">既存写真の×を押すと、保存時にクラウドから削除されます。</p>
       </div>
 
       <div class="form-grid">
@@ -190,7 +192,14 @@
     </article>
   </dialog>
 
-  <script src="./config.js?v=003"></script>
-  <script type="module" src="./app.js?v=003"></script>
+  <dialog id="storeHistoryDialog" class="modal store-history-modal">
+    <article class="modal-card store-history-card">
+      <button id="closeStoreHistory" class="icon-button detail-close" type="button" aria-label="閉じる">×</button>
+      <div id="storeHistoryContent"></div>
+    </article>
+  </dialog>
+
+  <script src="./config.js?v=004"></script>
+  <script type="module" src="./app.js?v=004"></script>
 </body>
 </html>
