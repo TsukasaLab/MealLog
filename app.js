@@ -1034,7 +1034,7 @@ bootstrap();
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
-      const registration = await navigator.serviceWorker.register('./sw.js?v=013');
+      const registration = await navigator.serviceWorker.register('./sw.js?v=015');
       await registration.update();
     } catch (error) {
       console.error('ServiceWorker registration failed', error);

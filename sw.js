@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meallog-v014-shell';
+const CACHE_NAME = 'meallog-v015-shell';
 const FALLBACK_PAGE = './index.html';
 
 const PRECACHE = [
