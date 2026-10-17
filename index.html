@@ -16,9 +16,9 @@
   <link rel="stylesheet" href="./v003.css?v=006" />
   <link rel="stylesheet" href="./v004.css?v=006" />
   <link rel="stylesheet" href="./v005.css?v=006" />
-  <link rel="stylesheet" href="./v006.css?v=007
-  <link rel="stylesheet" href="./v007.css?v=007" />" />
-  <link rel="manifest" href="./manifest.webmanifest?v=007" />
+  <link rel="stylesheet" href="./v006.css?v=009" />
+  <link rel="stylesheet" href="./v009.css?v=009" />
+  <link rel="manifest" href="./manifest.webmanifest?v=009" />
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
 </head>
@@ -28,7 +28,7 @@
   <section id="setupView" class="setup-view hidden">
     <div class="setup-card">
       <div class="brand-mark large" aria-hidden="true">M</div>
-      <p class="eyebrow">MealLog Ver.0.07</p>
+      <p class="eyebrow">MealLog Ver.0.09</p>
       <h1>Supabaseの接続設定が必要です</h1>
       <p><code>config.js</code> にProject URLとPublishable keyを設定してください。</p>
     </div>
@@ -102,24 +102,41 @@
       </div>
     </header>
 
-    <section class="hero">
-      <div class="hero-copy">
-        <p class="eyebrow">MATSURI FOOD DIARY</p>
-        <div class="hero-badge-row">
-          <span class="hero-badge">屋台みたいに楽しい</span>
-          <span class="hero-badge alt">パッと記録</span>
-          <span class="hero-badge mint">思い出も保存</span>
+    <section class="hero hero-dashboard">
+      <div class="dashboard-main">
+        <div class="dashboard-heading">
+          <p class="eyebrow">MATSURI FOOD DIARY</p>
+          <h1>記録をサッと、見返しをパッと。</h1>
+          <p>CarLogみたいに使いやすく、写真・店舗・価格までまとめて残せる食事記録アプリ。</p>
         </div>
-        <h1>おいしい瞬間を、<br class="desktop-break" />ポンっと記録。</h1>
-        <p>写真・場所・メモを、屋台みたいににぎやかで楽しい雰囲気のまま残せます。</p>
+        <div class="summary-cards">
+          <article class="summary-card pink">
+            <span class="summary-label">今月の記録</span>
+            <strong id="summaryCount">0件</strong>
+            <small id="summaryCountSub">まずは1件記録しよう</small>
+          </article>
+          <article class="summary-card orange">
+            <span class="summary-label">今月の食費</span>
+            <strong id="summarySpend">¥0</strong>
+            <small id="summarySpendSub">価格を入れると集計できます</small>
+          </article>
+          <article class="summary-card mint">
+            <span class="summary-label">よく行く店</span>
+            <strong id="summaryTopStore">まだなし</strong>
+            <small id="summaryTopStoreSub">店舗記録なし</small>
+          </article>
+        </div>
       </div>
-      <div class="hero-side">
+      <div class="hero-side dashboard-side">
         <button id="openUploadHero" class="hero-add" type="button">
           <span class="hero-add-icon">＋</span>
-          <span><strong>食事を記録</strong><small>写真・場所・評価を追加</small></span>
+          <span><strong>食事を記録</strong><small>写真・場所・価格・評価を追加</small></span>
         </button>
-        <div class="hero-lanterns" aria-hidden="true">
-          <span></span><span></span><span></span>
+        <div class="quick-chip-grid" aria-hidden="true">
+          <span class="quick-chip pink">🍧 写真</span>
+          <span class="quick-chip orange">🏮 店舗</span>
+          <span class="quick-chip yellow">💴 価格</span>
+          <span class="quick-chip mint">⭐ 評価</span>
         </div>
       </div>
     </section>
@@ -182,6 +199,8 @@
         </div>
 
         <label id="storeNameField" class="wide hidden"><span>店舗名 <em>任意</em></span><input id="storeName" type="text" maxlength="120" placeholder="例：○○ラーメン 敦賀店" /></label>
+
+        <label class="price-field"><span>価格 <em>任意</em></span><input id="priceInput" type="number" min="0" step="1" inputmode="numeric" placeholder="例：980" /><small>円。入力すると店舗ごとの集計に使えます。</small></label>
 
         <label class="wide share-select-field">
           <span>共有範囲</span>
@@ -262,7 +281,7 @@
     </article>
   </dialog>
 
-  <script src="./config.js?v=007"></script>
-  <script type="module" src="./app.js?v=007"></script>
+  <script src="./config.js?v=009"></script>
+  <script type="module" src="./app.js?v=009"></script>
 </body>
 </html>

@@ -17,7 +17,7 @@ const els = {
   mealForm: $('mealForm'), cameraButton: $('cameraButton'), libraryButton: $('libraryButton'), cameraInput: $('cameraInput'), libraryInput: $('libraryInput'),
   previewArea: $('previewArea'), previewGrid: $('previewGrid'), clearPhotos: $('clearPhotos'), photoEditHint: $('photoEditHint'),
   mealTitle: $('mealTitle'), mealNote: $('mealNote'), eatenAt: $('eatenAt'), saveMeal: $('saveMeal'), uploadStatus: $('uploadStatus'),
-  storeNameField: $('storeNameField'), storeName: $('storeName'), ratingStars: $('ratingStars'), ratingInput: $('ratingInput'), clearRating: $('clearRating'),
+  storeNameField: $('storeNameField'), storeName: $('storeName'), priceInput: $('priceInput'), ratingStars: $('ratingStars'), ratingInput: $('ratingInput'), clearRating: $('clearRating'),
   shareGroupSelect: $('shareGroupSelect'),
   timeline: $('timeline'), loadingState: $('loadingState'), emptyState: $('emptyState'), searchInput: $('searchInput'), refreshButton: $('refreshButton'),
   detailDialog: $('detailDialog'), detailContent: $('detailContent'), closeDetail: $('closeDetail'),
@@ -25,6 +25,9 @@ const els = {
   shareButtonTop: $('shareButtonTop'), shareNav: $('shareNav'), shareDialog: $('shareDialog'), closeShare: $('closeShare'),
   shareGroupsList: $('shareGroupsList'), createGroupForm: $('createGroupForm'), newGroupName: $('newGroupName'),
   joinGroupForm: $('joinGroupForm'), inviteCodeInput: $('inviteCodeInput'), shareMessage: $('shareMessage'),
+  summaryCount: $('summaryCount'), summaryCountSub: $('summaryCountSub'),
+  summarySpend: $('summarySpend'), summarySpendSub: $('summarySpendSub'),
+  summaryTopStore: $('summaryTopStore'), summaryTopStoreSub: $('summaryTopStoreSub'),
   toast: $('toast')
 };
 
@@ -35,6 +38,8 @@ let entriesCache = [];
 let shareGroups = [];
 let shareMemberCounts = new Map();
 let toastTimer = null;
+let supportsPriceColumn = true;
+let priceSchemaHintShown = false;
 
 let editingEntryId = null;
 let editingExistingPhotos = [];
@@ -69,6 +74,16 @@ function formatDate(iso) {
   return new Intl.DateTimeFormat('ja-JP', {
     year:'numeric', month:'long', day:'numeric', weekday:'short', hour:'2-digit', minute:'2-digit'
   }).format(new Date(iso));
+}
+
+function formatYen(value) {
+  if (value === null || value === undefined || value === '' || Number.isNaN(Number(value))) return '－';
+  return `¥${new Intl.NumberFormat('ja-JP').format(Number(value))}`;
+}
+
+function monthKey(dateLike) {
+  const date = new Date(dateLike);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 }
 
 function fileExt(name) {
@@ -307,6 +322,7 @@ function openEdit(id) {
   if (placeRadio) placeRadio.checked = true;
   updateStoreField();
   if ((entry.place_type || 'home') !== 'home') els.storeName.value = entry.store_name || '';
+  els.priceInput.value = entry.price_yen ?? '';
   setRating(entry.rating || 0);
   renderShareGroupSelect(entry.share_group_id || '');
 
@@ -386,11 +402,13 @@ function renderPreviews() {
 
 function formValues() {
   const placeType = getPlaceType();
+  const rawPrice = els.priceInput.value.trim();
   return {
     title: els.mealTitle.value.trim(),
     note: els.mealNote.value.trim(),
     placeType,
     storeName: placeType === 'home' ? '' : els.storeName.value.trim(),
+    priceYen: rawPrice === '' ? null : Math.max(0, Number(rawPrice)),
     rating: els.ratingInput.value ? Number(els.ratingInput.value) : null,
     shareGroupId: els.shareGroupSelect.value || null,
     eatenAt: new Date(els.eatenAt.value).toISOString()
@@ -446,6 +464,7 @@ async function createEntry(values) {
       place_type: values.placeType,
       store_name: values.storeName,
       rating: values.rating,
+      ...(supportsPriceColumn ? { price_yen: values.priceYen } : {}),
       share_group_id: values.shareGroupId
     });
     if (entryError) throw entryError;
@@ -477,6 +496,7 @@ async function editEntry(values) {
         place_type: values.placeType,
         store_name: values.storeName,
         rating: values.rating,
+        ...(supportsPriceColumn ? { price_yen: values.priceYen } : {}),
         share_group_id: values.shareGroupId
       })
       .eq('id', entry.id);
@@ -553,10 +573,21 @@ async function loadEntries() {
   els.timeline.innerHTML = '';
 
   try {
-    const { data, error } = await supabase
-      .from('meal_entries')
-      .select('id,user_id,title,note,eaten_at,created_at,place_type,store_name,rating,share_group_id,meal_photos(id,storage_path,original_name)')
-      .order('eaten_at', { ascending:false });
+    const baseSelect = 'id,user_id,title,note,eaten_at,created_at,place_type,store_name,rating,share_group_id';
+    const selectWithPrice = `${baseSelect},price_yen,meal_photos(id,storage_path,original_name)`;
+    const selectWithoutPrice = `${baseSelect},meal_photos(id,storage_path,original_name)`;
+
+    let query = supabase.from('meal_entries').select(supportsPriceColumn ? selectWithPrice : selectWithoutPrice).order('eaten_at', { ascending:false });
+    let { data, error } = await query;
+
+    if (error && /price_yen/.test(error.message || '')) {
+      supportsPriceColumn = false;
+      ({ data, error } = await supabase.from('meal_entries').select(selectWithoutPrice).order('eaten_at', { ascending:false }));
+      if (!priceSchemaHintShown) {
+        toast('価格機能はSQL更新後に有効になります');
+        priceSchemaHintShown = true;
+      }
+    }
     if (error) throw error;
 
     const entries = data || [];
@@ -573,16 +604,46 @@ async function loadEntries() {
       ...entry,
       place_type: entry.place_type || 'home',
       store_name: entry.store_name || '',
+      price_yen: supportsPriceColumn ? (entry.price_yen ?? null) : null,
       rating: entry.rating ?? null,
       share_group_id: entry.share_group_id || null,
       photos: (entry.meal_photos || []).map(p => ({ ...p, url:signedMap.get(p.storage_path) })).filter(p => p.url)
     }));
+    renderDashboardSummary();
     renderEntries();
   } catch (error) {
     console.error(error);
+    renderDashboardSummary();
     els.timeline.innerHTML = `<div class="state-card"><p>読み込みに失敗しました。<br>${escapeHtml(error.message || '')}</p></div>`;
   } finally {
     els.loadingState.classList.add('hidden');
+  }
+}
+
+function renderDashboardSummary() {
+  const now = new Date();
+  const currentMonth = monthKey(now);
+  const monthRows = entriesCache.filter(entry => monthKey(entry.eaten_at) === currentMonth);
+  const dineoutRows = monthRows.filter(entry => entry.place_type !== 'home');
+  const pricedRows = monthRows.filter(entry => entry.price_yen !== null && entry.price_yen !== undefined && entry.price_yen !== '');
+  const totalSpend = pricedRows.reduce((sum, entry) => sum + Number(entry.price_yen || 0), 0);
+
+  const storeCounter = new Map();
+  entriesCache.forEach(entry => {
+    if (!entry.store_name) return;
+    const key = entry.store_name.trim();
+    if (!key) return;
+    storeCounter.set(key, (storeCounter.get(key) || 0) + 1);
+  });
+  const topStore = [...storeCounter.entries()].sort((a, b) => b[1] - a[1])[0] || null;
+
+  if (els.summaryCount) {
+    els.summaryCount.textContent = `${monthRows.length}件`;
+    els.summaryCountSub.textContent = monthRows.length ? `外食・テイクアウト ${dineoutRows.length}件` : 'まずは1件記録しよう';
+    els.summarySpend.textContent = supportsPriceColumn ? formatYen(totalSpend) : '－';
+    els.summarySpendSub.textContent = supportsPriceColumn ? (pricedRows.length ? `${pricedRows.length}件の価格を集計` : '価格を入れると集計できます') : 'SQL更新で価格集計が有効になります';
+    els.summaryTopStore.textContent = topStore ? topStore[0] : 'まだなし';
+    els.summaryTopStoreSub.textContent = topStore ? `${topStore[1]}回 記録` : '店舗記録なし';
   }
 }
 
@@ -614,9 +675,12 @@ function renderEntries() {
       <div class="meal-body">
         <div class="meal-meta"><span>${escapeHtml(formatDate(entry.eaten_at))}</span></div>
         <h3>${escapeHtml(entry.title)}</h3>
+        <div class="meal-subline">
+          ${entry.store_name ? `<button class="store-inline store-history-button" type="button">📍 ${escapeHtml(entry.store_name)}</button>` : `<span class="place-inline">${escapeHtml(placeLabel(entry.place_type))}</span>`}
+          ${entry.price_yen !== null && entry.price_yen !== undefined && entry.price_yen !== '' ? `<span class="price-inline">${escapeHtml(formatYen(entry.price_yen))}</span>` : ''}
+        </div>
         <div class="meal-tags">
           <span class="meal-tag place">${escapeHtml(placeLabel(entry.place_type))}</span>
-          ${entry.store_name ? `<button class="meal-tag store store-history-button" type="button">📍 ${escapeHtml(entry.store_name)}</button>` : ''}
           ${entry.rating ? `<span class="meal-tag rating">★ ${entry.rating}</span>` : `<span class="meal-tag rating soft">未評価</span>`}
           ${entry.share_group_id ? `<span class="meal-tag shared">👥 ${escapeHtml(groupName(entry.share_group_id))}</span>` : ''}
           ${entry.share_group_id && !canEditEntry(entry) ? `<span class="meal-tag shared-by">メンバーの記録</span>` : ''}
@@ -668,11 +732,14 @@ function openDetail(id) {
       <h2>${escapeHtml(entry.title)}</h2>
       <div class="detail-date">${escapeHtml(formatDate(entry.eaten_at))}</div>
       <div class="detail-tags">${tags}</div>
-      ${entry.store_name ? `
-        <button class="detail-store store-detail-button" type="button">
-          <span><strong>店舗</strong>${escapeHtml(entry.store_name)}</span>
-          <span class="store-detail-arrow">履歴を見る ›</span>
-        </button>` : ''}
+      <div class="detail-facts">
+        ${entry.store_name ? `
+          <button class="detail-store store-detail-button" type="button">
+            <span><strong>店舗</strong>${escapeHtml(entry.store_name)}</span>
+            <span class="store-detail-arrow">履歴を見る ›</span>
+          </button>` : ''}
+        ${entry.price_yen !== null && entry.price_yen !== undefined && entry.price_yen !== '' ? `<div class="detail-fact-box"><strong>価格</strong><span>${escapeHtml(formatYen(entry.price_yen))}</span></div>` : ''}
+      </div>
       <div class="detail-note">${escapeHtml(entry.note || 'メモはありません')}</div>
       ${canEditEntry(entry) ? `<div class="detail-actions-v004">
         <button class="detail-edit" type="button">この記録を編集</button>
@@ -708,6 +775,9 @@ function openStoreHistory(storeName) {
 
   const rated = rows.filter(entry => entry.rating);
   const avg = rated.length ? (rated.reduce((sum, entry) => sum + Number(entry.rating), 0) / rated.length).toFixed(1) : null;
+  const priced = rows.filter(entry => entry.price_yen !== null && entry.price_yen !== undefined && entry.price_yen !== '');
+  const totalSpend = priced.reduce((sum, entry) => sum + Number(entry.price_yen || 0), 0);
+  const avgSpend = priced.length ? Math.round(totalSpend / priced.length) : null;
 
   const listHtml = rows.map(entry => {
     const cover = entry.photos?.[0]?.url || '';
@@ -717,7 +787,7 @@ function openStoreHistory(storeName) {
         <span class="store-history-entry-main">
           <strong>${escapeHtml(entry.title)}</strong>
           <small>${escapeHtml(formatDate(entry.eaten_at))}</small>
-          <span class="store-history-entry-meta">${entry.rating ? `★ ${entry.rating}` : '未評価'}${entry.note ? ` ・ ${escapeHtml(entry.note.slice(0, 45))}` : ''}</span>
+          <span class="store-history-entry-meta">${entry.rating ? `★ ${entry.rating}` : '未評価'}${entry.price_yen !== null && entry.price_yen !== undefined && entry.price_yen !== '' ? ` ・ ${escapeHtml(formatYen(entry.price_yen))}` : ''}${entry.note ? ` ・ ${escapeHtml(entry.note.slice(0, 45))}` : ''}</span>
         </span>
       </button>`;
   }).join('');
@@ -729,7 +799,8 @@ function openStoreHistory(storeName) {
       <div class="store-stats">
         <div><strong>${rows.length}</strong><span>訪問記録</span></div>
         <div><strong>${avg ? `★ ${avg}` : '－'}</strong><span>平均評価</span></div>
-        <div><strong>${rated.length}</strong><span>評価済み</span></div>
+        <div><strong>${priced.length ? formatYen(totalSpend) : '－'}</strong><span>合計金額</span></div>
+        <div><strong>${avgSpend !== null ? formatYen(avgSpend) : '－'}</strong><span>平均金額</span></div>
       </div>
     </div>
     <div class="store-history-list">${listHtml}</div>`;
