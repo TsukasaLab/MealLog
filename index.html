@@ -22,8 +22,8 @@
   <link rel="stylesheet" href="./v018.css?v=020" />
   <link rel="stylesheet" href="./v019.css?v=020" />
   <link rel="stylesheet" href="./v020.css?v=020" />
-  <link rel="stylesheet" href="./v021.css?v=021" />
-  <link rel="manifest" href="./manifest.webmanifest?v=020" />
+  <link rel="stylesheet" href="./v022.css?v=022" />
+  <link rel="manifest" href="./manifest.webmanifest?v=022" />
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
 </head>
@@ -33,7 +33,7 @@
   <section id="setupView" class="setup-view hidden">
     <div class="setup-card">
       <img class="brand-icon large" src="./icons/icon-192.png" alt="" aria-hidden="true" />
-      <p class="eyebrow">MealLog Ver.0.21</p>
+      <p class="eyebrow">MealLog Ver.0.22</p>
       <h1>Supabaseの接続設定が必要です</h1>
       <p><code>config.js</code> にProject URLとPublishable keyを設定してください。</p>
     </div>
@@ -91,99 +91,82 @@
   </section>
 
   <main id="appView" class="app-view hidden">
-    <div class="sakura-petal-layer" aria-hidden="true">
-      <span class="petal p1"></span><span class="petal p2"></span><span class="petal p3"></span><span class="petal p4"></span>
-      <span class="petal p5"></span><span class="petal p6"></span><span class="petal p7"></span><span class="petal p8"></span>
-      <span class="petal p9"></span><span class="petal p10"></span><span class="petal p11"></span><span class="petal p12"></span>
+    <div class="festival-shell">
+      <header class="app-header">
+        <div class="app-brand" aria-label="MealLog">
+          <img src="./icons/icon-192.png" alt="MealLog" class="app-brand-icon" />
+          <div class="app-brand-copy"><strong>MealLog</strong><small>FESTIVAL FOOD MEMORY</small></div>
+        </div>
+        <div class="app-header-actions">
+          <button id="shareButtonTop" class="round-action share-action" type="button" aria-label="共有">⌯</button>
+          <button id="openUploadTop" class="record-button" type="button"><span>＋</span><strong>記録する</strong></button>
+          <button id="profileButton" class="profile-action" type="button" aria-label="アカウントメニュー"><img src="./icons/icon-192.png" alt="" /><span id="avatarText" class="visually-hidden">M</span></button>
+        </div>
+        <div id="profileMenu" class="profile-menu hidden"><p id="profileEmail"></p><button id="logoutButton" type="button">ログアウト</button></div>
+      </header>
+
+      <div class="app-layout">
+        <aside class="desktop-sidebar" aria-label="メニュー">
+          <button class="side-nav active" type="button" data-side-action="home"><span>⌂</span><b>ホーム</b></button>
+          <button class="side-nav" type="button" data-side-action="meals"><span>🍴</span><b>食事の記録</b></button>
+          <button class="side-nav" type="button" data-side-action="stores"><span>▣</span><b>よく行く店</b></button>
+          <button class="side-nav" type="button" data-side-action="spend"><span>▤</span><b>食費の管理</b></button>
+          <button class="side-nav" type="button" data-side-action="stats"><span>▥</span><b>統計・レポート</b></button>
+          <button class="side-nav" type="button" data-side-action="favorite"><span>♡</span><b>お気に入り</b></button>
+          <button class="side-nav" type="button" data-side-action="settings"><span>⚙</span><b>設定</b></button>
+        </aside>
+
+        <section class="main-stage">
+          <section class="dashboard-panel">
+            <div class="dashboard-mascot" aria-hidden="true"><img src="./assets/mascot-hero.png" alt="" /></div>
+            <div class="search-row">
+              <label class="search-field"><span>⌕</span><input id="heroSearchInput" type="search" placeholder="食事・お店・タグで検索…" /></label>
+              <button id="heroRefreshButton" class="filter-button" type="button" aria-label="更新">☷</button>
+            </div>
+
+            <div class="place-section">
+              <div class="place-section-head"><h2><span>●</span> 食べた場所</h2><button id="clearPlaceFilterButton" class="clear-place active" type="button">すべて見る</button></div>
+              <div class="place-buttons">
+                <button class="place-button home" type="button" data-place-filter="home"><span class="place-icon">⌂</span><strong>自宅</strong></button>
+                <button class="place-button dineout" type="button" data-place-filter="dineout"><span class="place-icon">♜</span><strong>外食</strong></button>
+                <button class="place-button takeout" type="button" data-place-filter="takeout"><span class="place-icon">▣</span><strong>テイクアウト</strong></button>
+              </div>
+            </div>
+
+            <div class="summary-grid">
+              <article class="summary-tile count-tile">
+                <div class="summary-icon">🍜</div>
+                <div class="summary-copy"><span>今月の記録</span><strong id="summaryCount">0件</strong><small id="summaryCountSub">まずは1件記録</small></div>
+                <div class="summary-arrow">›</div>
+              </article>
+              <article class="summary-tile spend-tile">
+                <div class="summary-icon">👛</div>
+                <div class="summary-copy"><span>今月の食費</span><strong id="summarySpend">¥0</strong><small id="summarySpendSub">価格入力で自動集計</small></div>
+                <div class="summary-arrow">›</div>
+              </article>
+              <article class="summary-tile store-tile">
+                <div class="summary-icon shop-icon">🏪</div>
+                <div class="summary-copy"><span>よく行く店</span><strong id="summaryTopStore">未登録</strong><small id="summaryTopStoreSub">店舗を登録しよう</small></div>
+                <div class="summary-arrow">›</div>
+              </article>
+            </div>
+          </section>
+
+          <section id="recentMealsSection" class="recent-panel">
+            <div class="recent-heading"><div><p>RECENT MEALS</p><h2>🍴 最近の食事</h2></div><div class="view-tools"><input id="searchInput" type="search" hidden /><button id="refreshButton" class="view-all-button" type="button">すべて見る ›</button></div></div>
+            <div id="loadingState" class="state-card hidden"><div class="spinner"></div><p>クラウドから読み込み中…</p></div>
+            <div id="emptyState" class="empty-state hidden"><div class="empty-icon">＋</div><h3>まだ記録がありません</h3><p>最初の一皿を登録してみよう。</p><button id="openUploadEmpty" class="record-button compact" type="button">＋ 食事を記録</button></div>
+            <div id="timeline" class="timeline-grid"></div>
+          </section>
+
+          <section class="bottom-cta" aria-label="記録の案内">
+            <div class="cta-mascot"><img src="./assets/mascot-bottom.png" alt="" /></div>
+            <div class="cta-copy"><small>COLLECT YOUR MEMORIES</small><h3>食事を記録して<br />思い出をたくさん集めよう！</h3></div>
+            <button id="openUploadBottom" class="record-button large" type="button">＋ 食事を記録</button>
+          </section>
+        </section>
+      </div>
     </div>
-    <div class="festival-top-blossoms" aria-hidden="true"></div>
-    <div class="festival-side-banner festival-side-banner-left" aria-hidden="true"><span>たこ焼き</span></div>
-    <div class="festival-side-banner festival-side-banner-right" aria-hidden="true"><span>ラーメン</span></div>
-
-    <header class="topbar">
-      <div class="brand" aria-label="MealLog">
-        <img class="brand-icon" src="./icons/icon-192.png" alt="MealLog" />
-        <span><strong>MealLog</strong><small>祭りの味を、ずっとそばに</small></span>
-      </div>
-      <div class="topbar-actions">
-        <button id="openUploadTop" class="compact-add" type="button"><span class="compact-add-plus">＋</span><span>食事を記録</span></button>
-        <button id="profileButton" class="avatar-button mascot-avatar" type="button" aria-label="アカウントメニュー"><img src="./icons/icon-192.png" alt="" /><span id="avatarText" class="visually-hidden">M</span></button>
-      </div>
-      <div id="profileMenu" class="profile-menu hidden">
-        <p id="profileEmail"></p>
-        <button id="shareButtonTop" type="button">共有グループ</button>
-        <button id="logoutButton" type="button">ログアウト</button>
-      </div>
-    </header>
-
-    <section class="hero hero-dashboard night-dashboard">
-      <div class="hero-mascot" aria-hidden="true">
-        <div class="hero-mascot-badge"><img src="./assets/mascot-hero.png" alt="" /></div>
-      </div>
-
-      <div class="dashboard-search-wrap">
-        <label class="dashboard-search"><span aria-hidden="true">⌕</span><input id="heroSearchInput" type="search" placeholder="食事・お店・タグで検索…" /></label>
-        <button id="heroRefreshButton" class="dashboard-filter-button" type="button" aria-label="更新">☷</button>
-      </div>
-
-      <div class="dashboard-place-section">
-        <div class="mini-section-row">
-          <p class="mini-section-title">食べた場所</p>
-          <button id="clearPlaceFilterButton" class="place-clear-button active" type="button">すべて見る</button>
-        </div>
-        <div class="place-filter-chips" role="group" aria-label="記録の絞り込み">
-          <button class="place-filter-chip" type="button" data-place-filter="home"><span class="chip-icon">🏠</span><span>自宅</span></button>
-          <button class="place-filter-chip" type="button" data-place-filter="dineout"><span class="chip-icon">🍽️</span><span>外食</span></button>
-          <button class="place-filter-chip" type="button" data-place-filter="takeout"><span class="chip-icon">👜</span><span>テイクアウト</span></button>
-        </div>
-      </div>
-
-      <div class="summary-cards festival-summary-cards">
-        <article class="summary-card pink">
-          <span class="summary-card-icon">🍜</span>
-          <span class="summary-label">今月の記録</span>
-          <strong id="summaryCount">0件</strong>
-          <small id="summaryCountSub">まずは1件記録</small>
-        </article>
-        <article class="summary-card orange">
-          <span class="summary-card-icon">👛</span>
-          <span class="summary-label">今月の食費</span>
-          <strong id="summarySpend">¥0</strong>
-          <small id="summarySpendSub">価格入力で自動集計</small>
-        </article>
-        <article class="summary-card mint">
-          <span class="summary-card-icon">🏪</span>
-          <span class="summary-label">よく行く店</span>
-          <strong id="summaryTopStore">未登録</strong>
-          <small id="summaryTopStoreSub">店舗を登録しよう</small>
-        </article>
-      </div>
-    </section>
-
-    <section class="content-shell night-content-shell">
-      <div class="section-heading">
-        <div class="recent-heading-copy"><p class="eyebrow">RECENT MEALS</p><h2><span aria-hidden="true">🍴</span> 最近の食事</h2></div>
-        <div class="view-tools"><input id="searchInput" type="search" hidden /><button id="refreshButton" class="secondary-button" type="button">すべて見る</button></div>
-      </div>
-
-      <div id="loadingState" class="state-card hidden"><div class="spinner"></div><p>クラウドから読み込み中…</p></div>
-      <div id="emptyState" class="empty-state hidden">
-        <div class="empty-icon">＋</div><h3>まだ記録がありません</h3><p>最初の一皿を登録してみよう。</p>
-        <button id="openUploadEmpty" class="primary-button small" type="button">食事を記録</button>
-      </div>
-      <div id="timeline" class="timeline-grid"></div>
-
-      <section class="bottom-cta" aria-label="記録の案内">
-        <div class="bottom-cta-inner">
-          <div class="bottom-cta-mascot" aria-hidden="true"><img src="./assets/mascot-bottom.png" alt="" /></div>
-          <div class="bottom-cta-copy">
-            <p class="eyebrow">COLLECT YOUR MEMORIES</p>
-            <h3>食事を記録して<br />思い出をたくさん集めよう！</h3>
-          </div>
-          <button id="openUploadBottom" class="primary-button bottom-cta-button" type="button">＋　食事を記録</button>
-        </div>
-      </section>
-    </section>
   </main>
 
   <dialog id="uploadDialog" class="modal">
@@ -301,13 +284,13 @@
     </article>
   </dialog>
 
-  <script src="./config.js?v=021"></script>
+  <script src="./config.js?v=022"></script>
   <script>
     window.MEALLOG_CONFIG = window.MEALLOG_CONFIG || {
       SUPABASE_URL: "https://icgwnxppibsbiciuyvjg.supabase.co",
       SUPABASE_KEY: "sb_publishable_gzC7_Vxo4J0YJ-g-Psw0tw_gY8NF77M"
     };
   </script>
-  <script type="module" src="./app.js?v=021"></script>
+  <script type="module" src="./app.js?v=022"></script>
 </body>
 </html>

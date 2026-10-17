@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meallog-v021-shell';
+const CACHE_NAME = 'meallog-v022-shell';
 const FALLBACK_PAGE = './index.html';
 
 const PRECACHE = [
@@ -14,26 +14,11 @@ const PRECACHE = [
   './v018.css',
   './v019.css',
   './v020.css',
-  './v021.css',
+  './v022.css',
   './assets/night-festival-bg.jpg',
-  './assets/generated/festival-bg.png',
-  './assets/generated/ui-kit.png',
-  './assets/generated/topbar-bg.png',
-  './assets/generated/panel-left.png',
-  './assets/generated/panel-right.png',
-  './assets/generated/search-pill.png',
-  './assets/generated/search-action.png',
-  './assets/generated/pink-button.png',
-  './assets/generated/purple-button.png',
-  './assets/generated/card-pink.png',
-  './assets/generated/card-orange.png',
-  './assets/generated/card-teal.png',
-  './assets/generated/chip-white.png',
-  './assets/generated/chip-purple-1.png',
-  './assets/generated/chip-purple-2.png',
-  './assets/generated/content-panel.png',
   './assets/mascot-hero.png',
   './assets/mascot-bottom.png',
+  './assets/festival-bg-v22.png',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',

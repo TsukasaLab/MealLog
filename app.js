@@ -1046,14 +1046,44 @@ if (els.heroSearchInput) {
     renderEntries();
   });
 }
+
 if (els.heroRefreshButton) els.heroRefreshButton.addEventListener('click', loadEntries);
+
+document.querySelectorAll('[data-side-action]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-side-action]').forEach(item => item.classList.toggle('active', item === btn));
+    const action = btn.dataset.sideAction;
+    if (action === 'home') {
+      activePlaceFilter = 'all';
+      document.querySelectorAll('[data-place-filter]').forEach(chip => chip.classList.remove('active'));
+      els.clearPlaceFilterButton?.classList.add('active');
+      els.searchInput.value = '';
+      if (els.heroSearchInput) els.heroSearchInput.value = '';
+      renderEntries();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (action === 'meals') {
+      document.getElementById('recentMealsSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (action === 'settings') {
+      toggleProfileMenu(true);
+    } else if (action === 'stores') {
+      toast('「よく行く店」は集計カードから確認できます');
+      document.getElementById('summaryTopStore')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (action === 'spend') {
+      toast('「今月の食費」を表示しています');
+      document.getElementById('summarySpend')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      toast('このメニューは準備中です');
+    }
+  });
+});
+
 
 bootstrap();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
-      const registration = await navigator.serviceWorker.register('./sw.js?v=021');
+      const registration = await navigator.serviceWorker.register('./sw.js?v=022');
       await registration.update();
     } catch (error) {
       console.error('ServiceWorker registration failed', error);
