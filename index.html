@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#fff8f5" />
+  <title>MealLog</title>
+  <meta name="description" content="食べたものを写真と文章で残す、シンプルな食事記録アプリ" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <section id="setupView" class="setup-view hidden">
+    <div class="setup-card">
+      <div class="brand-mark large" aria-hidden="true">M</div>
+      <p class="eyebrow">MealLog Ver.0.02</p>
+      <h1>Supabaseの接続設定が必要です</h1>
+      <p>同梱の <code>README.md</code> と <code>setup.sql</code> を使ってSupabaseを設定し、<code>config.js</code> にURLとPublishable keyを入れてください。</p>
+      <div class="setup-files">
+        <span>README.md</span><span>setup.sql</span><span>config.js</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="authView" class="auth-view hidden">
+    <div class="auth-shell">
+      <div class="auth-visual">
+        <div class="auth-visual-content">
+          <div class="brand-mark large">M</div>
+          <p class="eyebrow light">MEAL MEMORY</p>
+          <h1>食べた一皿を、<br />ちゃんと残しておく。</h1>
+          <p>スマホで撮って、そのままクラウドへ。端末が変わっても、ログインすれば続きを見られます。</p>
+        </div>
+        <div class="food-orbs" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="auth-panel">
+        <div class="auth-panel-inner">
+          <div class="mobile-brand"><span class="brand-mark">M</span><strong>MealLog</strong></div>
+          <p class="eyebrow">WELCOME</p>
+          <h2 id="authTitle">おかえりなさい</h2>
+          <p id="authLead" class="subtle">Googleアカウントですぐにログインできます</p>
+
+          <button id="googleLoginButton" class="google-button" type="button">
+            <span class="google-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20" role="img" aria-hidden="true">
+                <path fill="#4285F4" d="M21.35 12.2c0-.64-.06-1.25-.16-1.84H12v3.48h5.25a4.5 4.5 0 0 1-1.95 2.95v2.45h3.16c1.85-1.7 2.89-4.22 2.89-7.04Z"/>
+                <path fill="#34A853" d="M12 21.75c2.64 0 4.85-.88 6.46-2.39l-3.16-2.45c-.88.59-2 .94-3.3.94-2.55 0-4.72-1.72-5.49-4.04H3.25v2.53A9.75 9.75 0 0 0 12 21.75Z"/>
+                <path fill="#FBBC05" d="M6.51 13.81A5.86 5.86 0 0 1 6.2 12c0-.63.11-1.24.31-1.81V7.66H3.25A9.75 9.75 0 0 0 2.25 12c0 1.57.38 3.06 1 4.34l3.26-2.53Z"/>
+                <path fill="#EA4335" d="M12 6.15c1.44 0 2.73.5 3.75 1.47l2.8-2.8C16.85 3.24 14.64 2.25 12 2.25a9.75 9.75 0 0 0-8.75 5.41l3.26 2.53C7.28 7.87 9.45 6.15 12 6.15Z"/>
+              </svg>
+            </span>
+            <span>Googleで続ける</span>
+          </button>
+
+          <div class="auth-divider"><span>または</span></div>
+
+          <form id="authForm" class="form-stack">
+            <label>
+              <span>メールアドレス</span>
+              <input id="emailInput" type="email" autocomplete="email" placeholder="name@example.com" required />
+            </label>
+            <label>
+              <span>パスワード</span>
+              <div class="password-wrap">
+                <input id="passwordInput" type="password" autocomplete="current-password" minlength="6" placeholder="6文字以上" required />
+                <button id="togglePassword" class="icon-button inside" type="button" aria-label="パスワードを表示">見る</button>
+              </div>
+            </label>
+            <button id="authSubmit" class="primary-button" type="submit">ログイン</button>
+          </form>
+
+          <button id="switchAuthMode" class="text-button" type="button">はじめて使う方はこちら</button>
+          <p id="authMessage" class="form-message" aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main id="appView" class="app-view hidden">
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="MealLog ホーム">
+        <span class="brand-mark">M</span>
+        <span><strong>MealLog</strong><small>Food memory</small></span>
+      </a>
+      <div class="topbar-actions">
+        <button id="openUploadTop" class="compact-add" type="button">＋ 記録する</button>
+        <button id="profileButton" class="avatar-button" type="button" aria-label="アカウントメニュー"><span id="avatarText">M</span></button>
+      </div>
+      <div id="profileMenu" class="profile-menu hidden">
+        <p id="profileEmail"></p>
+        <button id="logoutButton" type="button">ログアウト</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <p class="eyebrow">MY FOOD DIARY</p>
+        <h1>今日の「おいしかった」を、<br class="desktop-break" />写真で残そう。</h1>
+        <p>撮った写真も、フォルダの写真も。アップロードしたら自分専用のクラウドアルバムに保存されます。</p>
+      </div>
+      <button id="openUploadHero" class="hero-add" type="button">
+        <span class="hero-add-icon">＋</span>
+        <span><strong>食事を記録</strong><small>写真とメモを追加</small></span>
+      </button>
+    </section>
+
+    <section class="content-shell">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">TIMELINE</p>
+          <h2>食事の記録</h2>
+        </div>
+        <div class="view-tools">
+          <label class="search-box">
+            <span aria-hidden="true">⌕</span>
+            <input id="searchInput" type="search" placeholder="料理名・メモを検索" />
+          </label>
+          <button id="refreshButton" class="secondary-button" type="button">更新</button>
+        </div>
+      </div>
+
+      <div id="loadingState" class="state-card hidden">
+        <div class="spinner"></div><p>クラウドから読み込み中…</p>
+      </div>
+      <div id="emptyState" class="empty-state hidden">
+        <div class="empty-icon">＋</div>
+        <h3>まだ記録がありません</h3>
+        <p>最初の一皿を登録してみよう。</p>
+        <button id="openUploadEmpty" class="primary-button small" type="button">食事を記録</button>
+      </div>
+      <div id="timeline" class="timeline-grid"></div>
+    </section>
+
+    <nav class="bottom-nav" aria-label="メインメニュー">
+      <button class="active" type="button"><span>⌂</span><small>ホーム</small></button>
+      <button id="openUploadNav" class="nav-add" type="button"><span>＋</span><small>記録</small></button>
+      <button id="accountNav" type="button"><span>◎</span><small>アカウント</small></button>
+    </nav>
+  </main>
+
+  <dialog id="uploadDialog" class="modal">
+    <form id="mealForm" method="dialog" class="modal-card">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">NEW ENTRY</p>
+          <h2>食事を記録</h2>
+        </div>
+        <button id="closeUpload" class="icon-button" type="button" aria-label="閉じる">×</button>
+      </div>
+
+      <div class="photo-actions">
+        <button id="cameraButton" class="photo-action camera" type="button">
+          <span class="action-icon">●</span><span><strong>カメラで撮る</strong><small>今の一皿を撮影</small></span>
+        </button>
+        <button id="libraryButton" class="photo-action library" type="button">
+          <span class="action-icon">▦</span><span><strong>写真から選ぶ</strong><small>複数選択できます</small></span>
+        </button>
+        <input id="cameraInput" class="visually-hidden" type="file" accept="image/*" capture="environment" />
+        <input id="libraryInput" class="visually-hidden" type="file" accept="image/*" multiple />
+      </div>
+
+      <div id="previewArea" class="preview-area hidden">
+        <div class="preview-heading"><span>選択した写真</span><button id="clearPhotos" type="button">すべて外す</button></div>
+        <div id="previewGrid" class="preview-grid"></div>
+      </div>
+
+      <div class="form-grid">
+        <label class="wide">
+          <span>食べたもの</span>
+          <input id="mealTitle" type="text" maxlength="80" placeholder="例：豚骨ラーメン" required />
+        </label>
+        <label>
+          <span>日時</span>
+          <input id="eatenAt" type="datetime-local" required />
+        </label>
+        <label class="wide">
+          <span>メモ <em>任意</em></span>
+          <textarea id="mealNote" rows="4" maxlength="800" placeholder="おいしかったもの、また食べたいものなど"></textarea>
+        </label>
+      </div>
+
+      <div class="modal-footer">
+        <span id="uploadStatus" class="upload-status"></span>
+        <button id="saveMeal" class="primary-button" type="submit">クラウドに保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="detailDialog" class="modal detail-modal">
+    <article class="modal-card detail-card">
+      <button id="closeDetail" class="icon-button detail-close" type="button" aria-label="閉じる">×</button>
+      <div id="detailContent"></div>
+    </article>
+  </dialog>
+
+  <script src="./config.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
