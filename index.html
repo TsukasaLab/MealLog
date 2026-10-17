@@ -3,16 +3,23 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#fff8f5" />
-  <title>MealLog</title>
-  <meta name="description" content="食べたものを写真と文章で残す、シンプルな食事記録アプリ" />
+  <meta name="theme-color" content="#ff5b7d" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="MealLog" />
+  <title>MealLog | FOOD MEMORY</title>
+  <meta name="description" content="お祭り気分で楽しく記録できる、写真付き食事記録アプリ MealLog" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./styles.css?v=005" />
-  <link rel="stylesheet" href="./v003.css?v=005" />
-  <link rel="stylesheet" href="./v004.css?v=005" />
-  <link rel="stylesheet" href="./v005.css?v=005" />
+  <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css?v=006" />
+  <link rel="stylesheet" href="./v003.css?v=006" />
+  <link rel="stylesheet" href="./v004.css?v=006" />
+  <link rel="stylesheet" href="./v005.css?v=006" />
+  <link rel="stylesheet" href="./v006.css?v=006" />
+  <link rel="manifest" href="./manifest.webmanifest?v=006" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
 </head>
 <body>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -20,7 +27,7 @@
   <section id="setupView" class="setup-view hidden">
     <div class="setup-card">
       <div class="brand-mark large" aria-hidden="true">M</div>
-      <p class="eyebrow">MealLog Ver.0.05</p>
+      <p class="eyebrow">MealLog Ver.0.06</p>
       <h1>Supabaseの接続設定が必要です</h1>
       <p><code>config.js</code> にProject URLとPublishable keyを設定してください。</p>
     </div>
@@ -31,9 +38,10 @@
       <div class="auth-visual">
         <div class="auth-visual-content">
           <div class="brand-mark large">M</div>
-          <p class="eyebrow light">MEAL MEMORY</p>
-          <h1>食べた一皿を、<br />ちゃんと残しておく。</h1>
-          <p>スマホで撮って、そのままクラウドへ。端末が変わっても、ログインすれば続きを見られます。</p>
+          <p class="eyebrow light">MATSURI FOOD MEMORY</p>
+          <div class="festival-mini-badges"><span>わくわく記録</span><span>写真で残す</span><span>毎日の一皿</span></div>
+          <h1>今日のごはんを、<br />お祭り気分で残そう。</h1>
+          <p>撮って・残して・見返して楽しい。ポップで使いやすい MealLog にデザインをアップデート。</p>
         </div>
         <div class="food-orbs" aria-hidden="true"><span></span><span></span><span></span></div>
       </div>
@@ -80,7 +88,7 @@
     <header class="topbar">
       <a class="brand" href="#home" aria-label="MealLog ホーム">
         <span class="brand-mark">M</span>
-        <span><strong>MealLog</strong><small>Food memory</small></span>
+        <span><strong>MealLog</strong><small>Festival Food Memory</small></span>
       </a>
       <div class="topbar-actions">
         <button id="shareButtonTop" class="share-top-button" type="button">共有</button>
@@ -94,15 +102,24 @@
     </header>
 
     <section class="hero">
-      <div>
-        <p class="eyebrow">MY FOOD DIARY</p>
-        <h1>今日の「おいしかった」を、<br class="desktop-break" />写真で残そう。</h1>
-        <p>写真だけじゃなく、どこで食べたか、また行きたいかも一緒に残せます。</p>
+      <div class="hero-copy">
+        <p class="eyebrow">MATSURI FOOD DIARY</p>
+        <div class="hero-badge-row">
+          <span class="hero-badge">屋台みたいに楽しい</span>
+          <span class="hero-badge alt">パッと記録</span>
+        </div>
+        <h1>今日の「おいしかった」を、<br class="desktop-break" />もっと楽しく残そう。</h1>
+        <p>写真だけじゃなく、どこで食べたか、また行きたいかも一緒に残せます。<br class="desktop-break" />毎日の食事記録を、アプリらしくポップに。</p>
       </div>
-      <button id="openUploadHero" class="hero-add" type="button">
-        <span class="hero-add-icon">＋</span>
-        <span><strong>食事を記録</strong><small>写真・場所・評価を追加</small></span>
-      </button>
+      <div class="hero-side">
+        <button id="openUploadHero" class="hero-add" type="button">
+          <span class="hero-add-icon">＋</span>
+          <span><strong>食事を記録</strong><small>写真・場所・評価を追加</small></span>
+        </button>
+        <div class="hero-lanterns" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
     </section>
 
     <section class="content-shell">
@@ -243,7 +260,7 @@
     </article>
   </dialog>
 
-  <script src="./config.js?v=005"></script>
-  <script type="module" src="./app.js?v=005"></script>
+  <script src="./config.js?v=006"></script>
+  <script type="module" src="./app.js?v=006"></script>
 </body>
 </html>

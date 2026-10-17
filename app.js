@@ -603,12 +603,12 @@ function renderEntries() {
 
   rows.forEach(entry => {
     const card = document.createElement('article');
-    card.className = 'meal-card';
     const cover = entry.photos?.[0]?.url || '';
+    card.className = `meal-card${cover ? '' : ' no-photo'}${entry.share_group_id ? ' is-shared' : ''}`;
 
     card.innerHTML = `
       <div class="meal-cover" data-open="${entry.id}">
-        ${cover ? `<img src="${cover}" alt="${escapeHtml(entry.title)}" loading="lazy">` : ''}
+        ${cover ? `<img src="${cover}" alt="${escapeHtml(entry.title)}" loading="lazy">` : `<div class="meal-cover-placeholder"><span>🍡</span><small>NO PHOTO</small></div>`}
         <span class="photo-count">${entry.photos.length}枚</span>
       </div>
       <div class="meal-body">
@@ -616,9 +616,9 @@ function renderEntries() {
         <h3>${escapeHtml(entry.title)}</h3>
         <div class="meal-tags">
           <span class="meal-tag place">${escapeHtml(placeLabel(entry.place_type))}</span>
-          ${entry.store_name ? `<button class="meal-tag store store-history-button" type="button">${escapeHtml(entry.store_name)}</button>` : ''}
-          ${entry.rating ? `<span class="meal-tag rating">★ ${entry.rating}</span>` : ''}
-          ${entry.share_group_id ? `<span class="meal-tag shared">共有・${escapeHtml(groupName(entry.share_group_id))}</span>` : ''}
+          ${entry.store_name ? `<button class="meal-tag store store-history-button" type="button">📍 ${escapeHtml(entry.store_name)}</button>` : ''}
+          ${entry.rating ? `<span class="meal-tag rating">★ ${entry.rating}</span>` : `<span class="meal-tag rating soft">未評価</span>`}
+          ${entry.share_group_id ? `<span class="meal-tag shared">👥 ${escapeHtml(groupName(entry.share_group_id))}</span>` : ''}
           ${entry.share_group_id && !canEditEntry(entry) ? `<span class="meal-tag shared-by">メンバーの記録</span>` : ''}
         </div>
         <div class="meal-note">${escapeHtml(entry.note || 'メモはありません')}</div>
@@ -651,7 +651,9 @@ function openDetail(id) {
   const entry = entriesCache.find(e => e.id === id);
   if (!entry) return;
 
-  const images = entry.photos.slice(0, 5).map(p => `<img src="${p.url}" alt="${escapeHtml(entry.title)}">`).join('');
+  const images = entry.photos.length
+    ? entry.photos.slice(0, 5).map(p => `<img src="${p.url}" alt="${escapeHtml(entry.title)}">`).join('')
+    : '<div class="detail-gallery-empty"><span>🍧</span><small>写真はまだありません</small></div>';
   const tags = [
     `<span class="meal-tag place">${escapeHtml(placeLabel(entry.place_type))}</span>`,
     entry.rating ? `<span class="meal-tag rating">★ ${entry.rating}</span>` : '',
@@ -922,3 +924,9 @@ els.searchInput.addEventListener('input', renderEntries);
 els.refreshButton.addEventListener('click', loadEntries);
 
 bootstrap();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(error => console.error('ServiceWorker registration failed', error));
+  });
+}
