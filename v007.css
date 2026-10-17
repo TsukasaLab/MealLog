@@ -1,0 +1,248 @@
+/* MealLog Ver.0.07 festival-app redesign */
+:root {
+  --matsuri-red:#ff5f63;
+  --matsuri-pink:#ff5ea8;
+  --matsuri-yellow:#ffd54f;
+  --matsuri-orange:#ffa452;
+  --matsuri-blue:#71d8ff;
+  --matsuri-mint:#74e0bd;
+  --matsuri-ink:#2c2224;
+  --matsuri-paper:#fff8f1;
+  --matsuri-cream:#fff1e4;
+  --matsuri-shadow:0 14px 34px rgba(112,53,49,.12);
+}
+
+html,body {
+  background:
+    radial-gradient(circle at 8% 12%, rgba(255,212,79,.35) 0 4px, transparent 5px),
+    radial-gradient(circle at 22% 22%, rgba(113,216,255,.35) 0 4px, transparent 5px),
+    radial-gradient(circle at 86% 14%, rgba(255,94,168,.28) 0 5px, transparent 6px),
+    radial-gradient(circle at 92% 74%, rgba(116,224,189,.30) 0 5px, transparent 6px),
+    linear-gradient(180deg, #fff5eb 0%, #fff0e6 100%);
+  background-size: auto;
+}
+
+body::before {
+  content:'';
+  position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.9;
+  background-image:
+    linear-gradient(90deg, rgba(255,255,255,0) 0 94%, rgba(255,255,255,.08) 94% 100%),
+    linear-gradient(0deg, rgba(255,255,255,0) 0 94%, rgba(255,255,255,.06) 94% 100%);
+  background-size: 26px 26px;
+  mix-blend-mode:soft-light;
+}
+body::after {
+  content:'';
+  position:fixed; left:0; right:0; top:0; height:92px; z-index:0; pointer-events:none;
+  background:
+    linear-gradient(90deg,
+      var(--matsuri-red) 0 8.33%,
+      var(--matsuri-yellow) 8.33% 16.66%,
+      var(--matsuri-blue) 16.66% 24.99%,
+      var(--matsuri-mint) 24.99% 33.32%,
+      var(--matsuri-pink) 33.32% 41.65%,
+      var(--matsuri-orange) 41.65% 49.98%,
+      var(--matsuri-red) 49.98% 58.31%,
+      var(--matsuri-yellow) 58.31% 66.64%,
+      var(--matsuri-blue) 66.64% 74.97%,
+      var(--matsuri-mint) 74.97% 83.3%,
+      var(--matsuri-pink) 83.3% 91.63%,
+      var(--matsuri-orange) 91.63% 100%);
+  clip-path: polygon(0 0,100% 0,100% 68%,96% 86%,92% 68%,88% 86%,84% 68%,80% 86%,76% 68%,72% 86%,68% 68%,64% 86%,60% 68%,56% 86%,52% 68%,48% 86%,44% 68%,40% 86%,36% 68%,32% 86%,28% 68%,24% 86%,20% 68%,16% 86%,12% 68%,8% 86%,4% 68%,0 86%);
+  opacity:.85;
+}
+
+.app-view,.auth-view,.setup-view {position:relative; z-index:1;}
+
+.topbar {
+  width:min(980px, calc(100% - 18px));
+  margin:20px auto 0;
+  padding:14px 18px;
+  border-radius:32px;
+  background:rgba(255,249,243,.95);
+  border:2px solid rgba(255,255,255,.72);
+  box-shadow:var(--matsuri-shadow);
+}
+.brand-mark {width:48px; height:48px; border-radius:16px; box-shadow:0 10px 18px rgba(255,94,168,.25);}
+.brand strong {font-size:26px;}
+.brand small {font-size:10px; letter-spacing:.14em; color:#b08374;}
+.share-top-button {background:#f9f0ff; color:#8b53b4; border:1px solid #ead9ff;}
+.compact-add {background:linear-gradient(135deg, #352426 0%, #1f1717 100%);}
+.avatar-button {background:#fffaf7;}
+
+.hero {
+  width:min(980px, calc(100% - 18px));
+  min-height:auto;
+  margin:18px auto 0;
+  padding:18px;
+  display:grid;
+  grid-template-columns: 1.15fr .85fr;
+  gap:16px;
+  border-radius:36px;
+  background: transparent;
+  box-shadow:none;
+}
+.hero::before,.hero::after {display:none;}
+.hero-copy,
+.hero-side {
+  background:rgba(255,252,248,.93);
+  border:2px solid rgba(255,255,255,.8);
+  box-shadow:var(--matsuri-shadow);
+  border-radius:30px;
+}
+.hero-copy {
+  padding:28px 28px 24px;
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 86% 22%, rgba(255,213,79,.34) 0 70px, transparent 71px),
+    radial-gradient(circle at 18% 80%, rgba(113,216,255,.2) 0 84px, transparent 85px),
+    linear-gradient(180deg, rgba(255,252,248,.96), rgba(255,247,239,.94));
+}
+.hero-copy::after {
+  content:'祭';
+  position:absolute; right:26px; bottom:8px;
+  font-family:'Mochiy Pop One','Noto Sans JP',sans-serif;
+  font-size:74px; line-height:1; color:rgba(255,95,99,.08);
+}
+.hero-copy h1 {
+  margin:14px 0 12px;
+  font-size:clamp(30px, 4.1vw, 48px);
+  line-height:1.18;
+  letter-spacing:-.05em;
+  max-width: 10.5em;
+}
+.hero-copy p:not(.eyebrow) {
+  max-width: 32em;
+  font-size:15px;
+  line-height:1.85;
+  color:#725b55;
+}
+.hero-badge-row {gap:8px; margin-top:10px;}
+.hero-badge {
+  min-height:30px; padding:0 12px; font-size:11px; border-radius:999px;
+  background:#312426; color:#fff; box-shadow:none;
+}
+.hero-badge.alt {background:linear-gradient(135deg, var(--matsuri-orange), var(--matsuri-pink));}
+.hero-badge.mint {background:linear-gradient(135deg, var(--matsuri-mint), #5ec6ff);}
+
+.hero-side {
+  padding:18px;
+  align-content:space-between;
+  background:
+    linear-gradient(180deg, rgba(255,246,241,.95), rgba(255,239,245,.92));
+}
+.hero-add {
+  width:100%; min-width:0; padding:18px;
+  border-radius:28px;
+  box-shadow:0 14px 28px rgba(54,32,27,.18);
+}
+.hero-add strong {font-size:28px;}
+.hero-add-icon {width:60px; height:60px; border-radius:20px;}
+.hero-side::after {
+  content:'';
+  display:block;
+  height:14px;
+  margin-top:14px;
+  border-radius:999px;
+  background: repeating-linear-gradient(90deg, #ff6e63 0 16px, #ffd54f 16px 32px, #71d8ff 32px 48px, #74e0bd 48px 64px, #ff5ea8 64px 80px);
+}
+.hero-lanterns {
+  justify-content:center; gap:20px; padding:8px 0 0;
+}
+.hero-lanterns span {
+  width:58px; height:76px; border-radius:20px;
+  background:linear-gradient(180deg, #ffd966 0%, #ff8d59 100%);
+}
+.hero-lanterns span:nth-child(2) {background:linear-gradient(180deg, #ff98ad 0%, #ff6c71 100%);}
+.hero-lanterns span:nth-child(3) {background:linear-gradient(180deg, #8be4c7 0%, #61b8ff 100%);}
+
+.content-shell {
+  width:min(980px, calc(100% - 18px));
+  margin:18px auto 110px;
+  padding:18px;
+  border-radius:34px;
+  background:rgba(255,252,248,.86);
+  border:2px solid rgba(255,255,255,.76);
+  box-shadow:var(--matsuri-shadow);
+}
+.section-heading {margin:4px 2px 18px;}
+.section-heading h2 {font-size:28px;}
+.view-tools {gap:10px;}
+.search-box,.secondary-button {
+  background:#fffaf7;
+  border:1px solid #edd8d0;
+  box-shadow:none;
+  border-radius:18px;
+}
+.search-box input,.secondary-button {min-height:48px;}
+
+.timeline-grid {
+  grid-template-columns:repeat(auto-fill, minmax(235px,1fr));
+  gap:18px;
+}
+.meal-card {
+  border-radius:26px;
+  border:1px solid #f0ddd7;
+  box-shadow:0 10px 26px rgba(117,71,66,.08);
+  background:#fffdfa;
+}
+.meal-card:hover {transform:translateY(-2px);}
+.meal-cover {aspect-ratio: 4 / 3;}
+.meal-body {padding:14px 14px 15px;}
+.meal-body h3 {font-size:22px;}
+.meal-note {font-size:13px; min-height:4.2em;}
+.meal-tag {font-size:10px; min-height:28px;}
+.view-entry {min-height:36px; border-radius:14px;}
+
+.auth-shell {width:min(980px, calc(100% - 18px));}
+.auth-visual {
+  background:
+    radial-gradient(circle at 75% 18%, rgba(255,255,255,.12) 0 74px, transparent 75px),
+    radial-gradient(circle at 20% 78%, rgba(255,255,255,.14) 0 130px, transparent 131px),
+    linear-gradient(180deg, #ff8e61 0%, #ff5ea8 100%);
+}
+.auth-visual h1 {font-size:clamp(36px,4.6vw,56px);}
+.auth-panel {background:rgba(255,251,247,.98);}
+
+.modal-card,.profile-menu,.store-history-card,.share-card,.detail-card {
+  border-radius:28px;
+  box-shadow:0 22px 48px rgba(108,61,57,.16);
+}
+
+.bottom-nav {
+  width:min(680px, calc(100% - 16px));
+  border-radius:24px;
+  background:rgba(45,32,31,.93);
+}
+
+@media (max-width: 840px) {
+  .hero {grid-template-columns:1fr;}
+}
+
+@media (max-width: 640px) {
+  body::after {height:72px;}
+  .topbar {width:calc(100% - 10px); margin-top:12px; padding:12px 14px; border-radius:24px;}
+  .brand strong {font-size:22px;}
+  .hero {
+    width:calc(100% - 10px);
+    padding:0;
+    gap:12px;
+    background:transparent;
+  }
+  .hero-copy,.hero-side {border-radius:24px;}
+  .hero-copy {padding:20px 18px 18px;}
+  .hero-copy h1 {font-size:34px; max-width:unset;}
+  .hero-copy p:not(.eyebrow) {font-size:14px;}
+  .hero-badge-row {gap:6px;}
+  .hero-badge {font-size:10px; min-height:28px;}
+  .hero-side {padding:14px;}
+  .hero-add {padding:16px; border-radius:22px;}
+  .hero-add strong {font-size:22px;}
+  .hero-lanterns {gap:12px;}
+  .hero-lanterns span {width:42px; height:56px; border-radius:14px;}
+  .content-shell {width:calc(100% - 10px); padding:14px; border-radius:24px; margin-top:14px;}
+  .section-heading {margin-bottom:14px;}
+  .section-heading h2 {font-size:24px;}
+  .timeline-grid {grid-template-columns:1fr; gap:14px;}
+}
