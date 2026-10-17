@@ -2,6 +2,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const cfg = window.MEALLOG_CONFIG || {};
 const isConfigured = Boolean(cfg.SUPABASE_URL && cfg.SUPABASE_KEY);
+const isDemoMode = !isConfigured;
 const supabase = isConfigured ? createClient(cfg.SUPABASE_URL, cfg.SUPABASE_KEY) : null;
 
 const $ = (id) => document.getElementById(id);
@@ -25,6 +26,10 @@ let currentUser = null;
 let selectedFiles = [];
 let entriesCache = [];
 let toastTimer = null;
+let demoObjectUrls = [];
+
+const DEMO_DB_NAME = 'meallog-demo';
+const DEMO_STORE = 'entries';
 
 function show(view) {
   [els.setupView, els.authView, els.appView].forEach(v => v.classList.add('hidden'));
@@ -61,9 +66,121 @@ function uuid() {
   return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function addDemoBanner() {
+  if (document.getElementById('demoModeBanner')) return;
+
+  const style = document.createElement('style');
+  style.textContent = `
+    .demo-mode-banner{
+      margin:0 auto;
+      padding:11px 20px;
+      background:linear-gradient(90deg,#fff0e8,#fff8f3);
+      border-bottom:1px solid rgba(215,126,84,.18);
+      color:#6c4434;
+      font-size:13px;
+      line-height:1.55;
+      text-align:center;
+    }
+    .demo-mode-banner strong{
+      display:inline-block;
+      margin-right:8px;
+      color:#d46254;
+    }
+    @media (max-width:640px){
+      .demo-mode-banner{padding:9px 14px;font-size:12px;text-align:left}
+      .demo-mode-banner strong{display:block;margin:0 0 2px}
+    }
+  `;
+  document.head.appendChild(style);
+
+  const banner = document.createElement('div');
+  banner.id = 'demoModeBanner';
+  banner.className = 'demo-mode-banner';
+  banner.innerHTML = '<strong>デモモード</strong> Supabase接続前のため、この端末のブラウザ内だけに仮保存されます。';
+  const topbar = els.appView.querySelector('.topbar');
+  topbar?.insertAdjacentElement('afterend', banner);
+}
+
+function setupDemoModeUI() {
+  addDemoBanner();
+  currentUser = {
+    id: 'demo-local',
+    email: 'デモモード',
+    user_metadata: { name: 'Demo' }
+  };
+
+  els.profileEmail.textContent = 'デモモード\nこの端末内に仮保存';
+  els.profileEmail.style.whiteSpace = 'pre-line';
+  els.avatarText.textContent = 'D';
+  els.saveMeal.textContent = '端末に保存';
+
+  const heroText = els.appView.querySelector('.hero > div > p:last-child');
+  if (heroText) {
+    heroText.textContent = '撮った写真も、フォルダの写真も。今はこの端末だけに仮保存して、実際の使い心地を試せます。';
+  }
+
+  const loadingText = els.loadingState.querySelector('p');
+  if (loadingText) loadingText.textContent = '端末から読み込み中…';
+}
+
+function openDemoDb() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DEMO_DB_NAME, 1);
+
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(DEMO_STORE)) {
+        const store = db.createObjectStore(DEMO_STORE, { keyPath: 'id' });
+        store.createIndex('eaten_at', 'eaten_at');
+      }
+    };
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function demoDbGetAll() {
+  const db = await openDemoDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DEMO_STORE, 'readonly');
+    const req = tx.objectStore(DEMO_STORE).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+    tx.oncomplete = () => db.close();
+  });
+}
+
+async function demoDbPut(entry) {
+  const db = await openDemoDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DEMO_STORE, 'readwrite');
+    tx.objectStore(DEMO_STORE).put(entry);
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror = () => { db.close(); reject(tx.error); };
+  });
+}
+
+async function demoDbDelete(id) {
+  const db = await openDemoDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DEMO_STORE, 'readwrite');
+    tx.objectStore(DEMO_STORE).delete(id);
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror = () => { db.close(); reject(tx.error); };
+  });
+}
+
+function revokeDemoObjectUrls() {
+  demoObjectUrls.forEach(url => URL.revokeObjectURL(url));
+  demoObjectUrls = [];
+}
+
 async function bootstrap() {
-  if (!isConfigured) {
-    show(els.setupView);
+  if (isDemoMode) {
+    show(els.appView);
+    setupDemoModeUI();
+    await loadEntries();
     return;
   }
 
@@ -106,7 +223,11 @@ function setAuthMode(mode) {
 els.switchAuthMode.addEventListener('click', () => setAuthMode(authMode === 'login' ? 'signup' : 'login'));
 
 els.googleLoginButton.addEventListener('click', async () => {
-  if (!supabase) return;
+  if (!supabase) {
+    toast('Supabase接続後にGoogleログインを有効にできます');
+    return;
+  }
+
   els.authMessage.textContent = '';
   els.googleLoginButton.disabled = true;
   const originalText = els.googleLoginButton.querySelector('span:last-child')?.textContent || 'Googleで続ける';
@@ -127,6 +248,7 @@ els.googleLoginButton.addEventListener('click', async () => {
     if (label) label.textContent = originalText;
   }
 });
+
 els.togglePassword.addEventListener('click', () => {
   const showPw = els.passwordInput.type === 'password';
   els.passwordInput.type = showPw ? 'text' : 'password';
@@ -135,6 +257,8 @@ els.togglePassword.addEventListener('click', () => {
 
 els.authForm.addEventListener('submit', async (e) => {
   e.preventDefault();
+  if (!supabase) return;
+
   els.authMessage.textContent = '';
   els.authSubmit.disabled = true;
   els.authSubmit.textContent = authMode === 'signup' ? '作成中…' : 'ログイン中…';
@@ -162,6 +286,12 @@ els.authForm.addEventListener('submit', async (e) => {
 });
 
 els.logoutButton.addEventListener('click', async () => {
+  if (isDemoMode) {
+    els.profileMenu.classList.add('hidden');
+    toast('今はデモモードです。Supabase接続後にログイン機能が使えます');
+    return;
+  }
+
   await supabase.auth.signOut();
   toast('ログアウトしました');
 });
@@ -183,6 +313,7 @@ function openUpload() {
   els.mealForm.reset();
   els.eatenAt.value = nowForDatetimeLocal();
   els.uploadStatus.textContent = '';
+  els.saveMeal.textContent = isDemoMode ? '端末に保存' : 'クラウドに保存';
   els.uploadDialog.showModal();
 }
 [els.openUploadTop, els.openUploadHero, els.openUploadEmpty, els.openUploadNav].forEach(btn => btn?.addEventListener('click', openUpload));
@@ -201,7 +332,8 @@ function addFiles(files) {
   selectedFiles = combined.filter(file => {
     const key = `${file.name}-${file.size}-${file.lastModified}`;
     if (seen.has(key)) return false;
-    seen.add(key); return true;
+    seen.add(key);
+    return true;
   }).slice(0, 12);
   renderPreviews();
   els.cameraInput.value = '';
@@ -218,10 +350,30 @@ function renderPreviews() {
     item.innerHTML = `<img src="${url}" alt="選択した写真 ${index+1}"><button type="button" aria-label="この写真を外す">×</button>`;
     item.querySelector('img').addEventListener('load', () => URL.revokeObjectURL(url), { once:true });
     item.querySelector('button').addEventListener('click', () => {
-      selectedFiles.splice(index, 1); renderPreviews();
+      selectedFiles.splice(index, 1);
+      renderPreviews();
     });
     els.previewGrid.appendChild(item);
   });
+}
+
+async function saveDemoEntry() {
+  const mealId = uuid();
+  const entry = {
+    id: mealId,
+    title: els.mealTitle.value.trim(),
+    note: els.mealNote.value.trim(),
+    eaten_at: new Date(els.eatenAt.value).toISOString(),
+    created_at: new Date().toISOString(),
+    photos: selectedFiles.map((file) => ({
+      id: uuid(),
+      blob: file,
+      original_name: file.name || 'photo.jpg',
+      type: file.type || 'image/jpeg'
+    }))
+  };
+
+  await demoDbPut(entry);
 }
 
 els.mealForm.addEventListener('submit', async (e) => {
@@ -233,6 +385,25 @@ els.mealForm.addEventListener('submit', async (e) => {
   }
 
   els.saveMeal.disabled = true;
+
+  if (isDemoMode) {
+    els.uploadStatus.textContent = 'この端末に保存中…';
+    try {
+      await saveDemoEntry();
+      els.uploadDialog.close();
+      selectedFiles = [];
+      toast('この端末に仮保存しました');
+      await loadEntries();
+    } catch (error) {
+      console.error(error);
+      els.uploadStatus.textContent = `保存できませんでした：${error.message || 'ブラウザの保存容量を確認してください'}`;
+    } finally {
+      els.saveMeal.disabled = false;
+      els.saveMeal.textContent = '端末に保存';
+    }
+    return;
+  }
+
   els.uploadStatus.textContent = 'クラウドへ保存中…';
   const mealId = uuid();
   const eatenAt = new Date(els.eatenAt.value).toISOString();
@@ -280,14 +451,51 @@ els.mealForm.addEventListener('submit', async (e) => {
     els.uploadStatus.textContent = `保存できませんでした：${error.message || '不明なエラー'}`;
   } finally {
     els.saveMeal.disabled = false;
+    els.saveMeal.textContent = 'クラウドに保存';
   }
 });
+
+async function loadDemoEntries() {
+  revokeDemoObjectUrls();
+  const rows = await demoDbGetAll();
+
+  entriesCache = rows
+    .sort((a, b) => new Date(b.eaten_at) - new Date(a.eaten_at))
+    .map(entry => ({
+      ...entry,
+      photos: (entry.photos || []).map(photo => {
+        const url = URL.createObjectURL(photo.blob);
+        demoObjectUrls.push(url);
+        return {
+          id: photo.id,
+          original_name: photo.original_name,
+          storage_path: '',
+          url
+        };
+      })
+    }));
+
+  renderEntries();
+}
 
 async function loadEntries() {
   if (!currentUser) return;
   els.loadingState.classList.remove('hidden');
   els.emptyState.classList.add('hidden');
   els.timeline.innerHTML = '';
+
+  if (isDemoMode) {
+    try {
+      await loadDemoEntries();
+    } catch (error) {
+      console.error(error);
+      els.timeline.innerHTML = `<div class="state-card"><p>端末内の記録を読み込めませんでした。<br>${escapeHtml(error.message || '')}</p></div>`;
+    } finally {
+      els.loadingState.classList.add('hidden');
+    }
+    return;
+  }
+
   try {
     const { data, error } = await supabase
       .from('meal_entries')
@@ -322,6 +530,7 @@ function renderEntries() {
   const rows = entriesCache.filter(entry => !q || `${entry.title} ${entry.note || ''}`.toLowerCase().includes(q));
   els.emptyState.classList.toggle('hidden', entriesCache.length !== 0 || q !== '');
   els.timeline.innerHTML = '';
+
   if (!rows.length && q) {
     els.timeline.innerHTML = `<div class="state-card"><p>「${escapeHtml(q)}」に一致する記録はありません。</p></div>`;
     return;
@@ -375,8 +584,24 @@ els.closeDetail.addEventListener('click', () => els.detailDialog.close());
 async function deleteEntry(id) {
   const entry = entriesCache.find(e => e.id === id);
   if (!entry) return;
-  const ok = confirm(`「${entry.title}」を削除しますか？\n写真もクラウドから削除されます。`);
-  if (!ok) return;
+
+  const warning = isDemoMode
+    ? `「${entry.title}」をこの端末から削除しますか？`
+    : `「${entry.title}」を削除しますか？\n写真もクラウドから削除されます。`;
+  if (!confirm(warning)) return;
+
+  if (isDemoMode) {
+    try {
+      await demoDbDelete(id);
+      toast('端末内の記録を削除しました');
+      await loadEntries();
+    } catch (error) {
+      console.error(error);
+      toast(`削除できませんでした：${error.message || ''}`);
+    }
+    return;
+  }
+
   try {
     const paths = entry.photos.map(p => p.storage_path);
     if (paths.length) {
