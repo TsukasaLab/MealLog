@@ -1,0 +1,43 @@
+/* MealLog Ver.0.26 - recent header action alignment */
+
+/* Match the Recent Meals action button position to the 食べた場所 header. */
+.recent-heading{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
+  align-items:center !important;
+  width:100% !important;
+  gap:14px !important;
+}
+.recent-heading-copy{
+  min-width:0 !important;
+  justify-self:start !important;
+}
+.recent-heading .view-tools{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  justify-self:end !important;
+  align-self:center !important;
+  margin:0 !important;
+  width:auto !important;
+  flex:0 0 auto !important;
+}
+.recent-heading .view-all-button{
+  margin:0 !important;
+  flex:0 0 auto !important;
+}
+
+@media(max-width:760px){
+  .recent-heading{
+    grid-template-columns:minmax(0,1fr) auto !important;
+    align-items:center !important;
+    gap:8px !important;
+  }
+  .recent-heading .view-tools{
+    justify-self:end !important;
+    margin:0 !important;
+  }
+  .recent-heading .view-all-button{
+    min-width:72px !important;
+  }
+}
