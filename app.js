@@ -14,7 +14,7 @@ const els = {
   authForm: $('authForm'), emailInput: $('emailInput'), passwordInput: $('passwordInput'),
   authTitle: $('authTitle'), authLead: $('authLead'), authSubmit: $('authSubmit'), authMessage: $('authMessage'),
   switchAuthMode: $('switchAuthMode'), togglePassword: $('togglePassword'), googleLoginButton: $('googleLoginButton'),
-  profileButton: $('profileButton'), profileMenu: $('profileMenu'), profileEmail: $('profileEmail'), avatarText: $('avatarText'), logoutButton: $('logoutButton'),
+  profileButton: $('profileButton'), profileAvatar: $('profileAvatar'), profileMenu: $('profileMenu'), profileEmail: $('profileEmail'), avatarText: $('avatarText'), logoutButton: $('logoutButton'),
   openUploadTop: $('openUploadTop'), openUploadHero: $('openUploadHero'), openUploadEmpty: $('openUploadEmpty'), openUploadBottom: $('openUploadBottom'), openUploadNav: $('openUploadNav'),
   accountNav: $('accountNav'), uploadDialog: $('uploadDialog'), closeUpload: $('closeUpload'),
   formEyebrow: $('formEyebrow'), formTitle: $('formTitle'),
@@ -32,7 +32,7 @@ const els = {
   summaryCount: $('summaryCount'), summaryCountSub: $('summaryCountSub'),
   summarySpend: $('summarySpend'), summarySpendSub: $('summarySpendSub'),
   summaryTopStore: $('summaryTopStore'), summaryTopStoreSub: $('summaryTopStoreSub'),
-  heroSearchInput: $('heroSearchInput'), heroRefreshButton: $('heroRefreshButton'), clearPlaceFilterButton: $('clearPlaceFilterButton'),
+  heroSearchInput: $('heroSearchInput'), heroRefreshButton: $('heroRefreshButton'), clearPlaceFilterButton: $('clearPlaceFilterButton'), analysisButton: $('analysisButton'), analysisDialog: $('analysisDialog'), closeAnalysis: $('closeAnalysis'), analysisContent: $('analysisContent'),
   toast: $('toast')
 };
 
@@ -46,6 +46,7 @@ let toastTimer = null;
 let supportsPriceColumn = true;
 let priceSchemaHintShown = false;
 let activePlaceFilter = 'all';
+let analysisPeriod = 'all';
 
 let editingEntryId = null;
 let editingExistingPhotos = [];
@@ -201,6 +202,15 @@ async function applySession(session) {
   els.profileEmail.textContent = displayName ? `${displayName}\n${email}` : email;
   els.profileEmail.style.whiteSpace = 'pre-line';
   els.avatarText.textContent = (displayName || email).slice(0, 1).toUpperCase();
+  if (els.profileAvatar) {
+    const avatarUrl = currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || '';
+    els.profileAvatar.src = avatarUrl || './icons/icon-192.png';
+    els.profileAvatar.alt = displayName ? `${displayName}のプロフィール画像` : 'アカウント';
+    els.profileAvatar.onerror = () => {
+      els.profileAvatar.onerror = null;
+      els.profileAvatar.src = './icons/icon-192.png';
+    };
+  }
   try {
     await loadShareGroups();
   } catch (error) {
@@ -312,7 +322,7 @@ function openUpload() {
   resetFormState();
   els.formEyebrow.textContent = 'NEW ENTRY';
   els.formTitle.textContent = '食事を記録';
-  els.saveMeal.textContent = 'クラウドに保存';
+  els.saveMeal.textContent = '保存する';
   els.uploadDialog.showModal();
 }
 
@@ -1028,6 +1038,138 @@ async function deleteEntry(id) {
   }
 }
 
+
+function filterAnalysisRows(period) {
+  const now = new Date();
+  return entriesCache.filter(entry => {
+    const date = new Date(entry.eaten_at);
+    if (Number.isNaN(date.getTime())) return false;
+    if (period === 'month') return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
+    if (period === 'year') return date.getFullYear() === now.getFullYear();
+    return true;
+  });
+}
+
+function analysisPeriodLabel(period) {
+  return ({ month:'今月', year:'今年', all:'全期間' })[period] || '全期間';
+}
+
+function renderAnalysis() {
+  if (!els.analysisContent) return;
+  const rows = filterAnalysisRows(analysisPeriod);
+  const priced = rows.filter(entry => entry.price_yen !== null && entry.price_yen !== undefined && entry.price_yen !== '');
+  const rated = rows.filter(entry => entry.rating !== null && entry.rating !== undefined && entry.rating !== '');
+  const totalSpend = priced.reduce((sum, entry) => sum + Number(entry.price_yen || 0), 0);
+  const avgSpend = priced.length ? Math.round(totalSpend / priced.length) : 0;
+  const avgRating = rated.length ? (rated.reduce((sum, entry) => sum + Number(entry.rating || 0), 0) / rated.length).toFixed(1) : '－';
+
+  const placeCounts = { home:0, dineout:0, takeout:0 };
+  const storeStats = new Map();
+  rows.forEach(entry => {
+    const type = entry.place_type || 'home';
+    if (Object.hasOwn(placeCounts, type)) placeCounts[type] += 1;
+    const store = String(entry.store_name || '').trim();
+    if (store) {
+      const current = storeStats.get(store) || { count:0, spend:0, priced:0, ratingSum:0, rated:0 };
+      current.count += 1;
+      if (entry.price_yen !== null && entry.price_yen !== undefined && entry.price_yen !== '') {
+        current.spend += Number(entry.price_yen || 0);
+        current.priced += 1;
+      }
+      if (entry.rating) {
+        current.ratingSum += Number(entry.rating);
+        current.rated += 1;
+      }
+      storeStats.set(store, current);
+    }
+  });
+
+  const storeRanking = [...storeStats.entries()]
+    .sort((a,b) => b[1].count - a[1].count || b[1].spend - a[1].spend)
+    .slice(0,5);
+
+  const monthStats = new Map();
+  rows.forEach(entry => {
+    const key = monthKey(entry.eaten_at);
+    const item = monthStats.get(key) || { count:0, spend:0 };
+    item.count += 1;
+    if (entry.price_yen !== null && entry.price_yen !== undefined && entry.price_yen !== '') item.spend += Number(entry.price_yen || 0);
+    monthStats.set(key, item);
+  });
+  const monthSeries = [...monthStats.entries()].sort((a,b) => a[0].localeCompare(b[0])).slice(-6);
+  const maxMonthCount = Math.max(1, ...monthSeries.map(([,v]) => v.count));
+  const maxMonthSpend = Math.max(1, ...monthSeries.map(([,v]) => v.spend));
+  const maxPlace = Math.max(1, ...Object.values(placeCounts));
+
+  const placeRows = [
+    ['自宅', placeCounts.home, 'home'],
+    ['外食', placeCounts.dineout, 'dineout'],
+    ['テイクアウト', placeCounts.takeout, 'takeout']
+  ].map(([label,count,type]) => `
+    <div class="analysis-bar-row">
+      <span>${label}</span>
+      <div class="analysis-bar-track"><i class="analysis-bar ${type}" style="width:${Math.round(Number(count)/maxPlace*100)}%"></i></div>
+      <b>${count}件</b>
+    </div>`).join('');
+
+  const monthRows = monthSeries.length ? monthSeries.map(([key, value]) => {
+    const [,m] = key.split('-');
+    return `<div class="analysis-month-row">
+      <span>${Number(m)}月</span>
+      <div class="analysis-month-bars">
+        <i class="analysis-count-bar" style="width:${Math.round(value.count/maxMonthCount*100)}%"></i>
+        <i class="analysis-spend-bar" style="width:${Math.round(value.spend/maxMonthSpend*100)}%"></i>
+      </div>
+      <b>${value.count}件 / ${formatYen(value.spend)}</b>
+    </div>`;
+  }).join('') : '<p class="analysis-empty">月別推移を表示できる記録がまだありません。</p>';
+
+  const storeRows = storeRanking.length ? storeRanking.map(([name, value], index) => `
+    <div class="analysis-store-row">
+      <span class="analysis-rank">${index + 1}</span>
+      <div><strong>${escapeHtml(name)}</strong><small>${value.count}回 ・ 合計 ${formatYen(value.spend)}${value.priced ? ` ・ 平均 ${formatYen(Math.round(value.spend/value.priced))}` : ''}${value.rated ? ` ・ ★${(value.ratingSum/value.rated).toFixed(1)}` : ''}</small></div>
+    </div>`).join('') : '<p class="analysis-empty">店舗を登録した記録が増えるとランキングを表示します。</p>';
+
+  els.analysisContent.innerHTML = `
+    <div class="analysis-period-caption">${analysisPeriodLabel(analysisPeriod)}の集計</div>
+    <div class="analysis-kpi-grid">
+      <article><span>記録数</span><strong>${rows.length}件</strong></article>
+      <article><span>食費合計</span><strong>${supportsPriceColumn ? formatYen(totalSpend) : '－'}</strong></article>
+      <article><span>平均金額</span><strong>${supportsPriceColumn && priced.length ? formatYen(avgSpend) : '－'}</strong></article>
+      <article><span>平均評価</span><strong>${avgRating === '－' ? '－' : `★ ${avgRating}`}</strong></article>
+    </div>
+    <section class="analysis-section">
+      <h3>食べた場所</h3>
+      ${rows.length ? placeRows : '<p class="analysis-empty">記録が増えると割合を表示します。</p>'}
+    </section>
+    <section class="analysis-section">
+      <div class="analysis-section-head"><h3>月別推移</h3><small><i class="legend count"></i>記録数 <i class="legend spend"></i>食費</small></div>
+      ${monthRows}
+    </section>
+    <section class="analysis-section">
+      <h3>よく行く店舗</h3>
+      ${storeRows}
+    </section>`;
+}
+
+function openAnalysisDialog() {
+  if (!els.analysisDialog) return;
+  document.querySelectorAll('[data-analysis-period]').forEach(btn => btn.classList.toggle('active', btn.dataset.analysisPeriod === analysisPeriod));
+  renderAnalysis();
+  els.analysisDialog.showModal();
+}
+
+els.analysisButton?.addEventListener('click', () => {
+  analysisPeriod = 'all';
+  openAnalysisDialog();
+});
+els.closeAnalysis?.addEventListener('click', () => els.analysisDialog.close());
+document.querySelectorAll('[data-analysis-period]').forEach(btn => btn.addEventListener('click', () => {
+  analysisPeriod = btn.dataset.analysisPeriod || 'all';
+  document.querySelectorAll('[data-analysis-period]').forEach(item => item.classList.toggle('active', item === btn));
+  renderAnalysis();
+}));
+
 els.searchInput.addEventListener('input', () => {
   if (els.heroSearchInput && els.heroSearchInput.value !== els.searchInput.value) els.heroSearchInput.value = els.searchInput.value;
   renderEntries();
@@ -1047,7 +1189,16 @@ if (els.heroSearchInput) {
   });
 }
 
-if (els.heroRefreshButton) els.heroRefreshButton.addEventListener('click', loadEntries);
+if (els.heroRefreshButton) els.heroRefreshButton.addEventListener('click', () => {
+  els.searchInput.value = els.heroSearchInput?.value || '';
+  renderEntries();
+  document.getElementById('recentMealsSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+if (els.heroSearchInput) els.heroSearchInput.addEventListener('keydown', event => {
+  if (event.key !== 'Enter') return;
+  event.preventDefault();
+  els.heroRefreshButton?.click();
+});
 
 document.querySelectorAll('[data-side-action]').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1069,8 +1220,11 @@ document.querySelectorAll('[data-side-action]').forEach(btn => {
       toast('「よく行く店」は集計カードから確認できます');
       document.getElementById('summaryTopStore')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } else if (action === 'spend') {
-      toast('「今月の食費」を表示しています');
-      document.getElementById('summarySpend')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      analysisPeriod = 'month';
+      openAnalysisDialog();
+    } else if (action === 'stats') {
+      analysisPeriod = 'all';
+      openAnalysisDialog();
     } else {
       toast('このメニューは準備中です');
     }
@@ -1083,7 +1237,7 @@ bootstrap();
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
-      const registration = await navigator.serviceWorker.register('./sw.js?v=022');
+      const registration = await navigator.serviceWorker.register('./sw.js?v=023');
       await registration.update();
     } catch (error) {
       console.error('ServiceWorker registration failed', error);
