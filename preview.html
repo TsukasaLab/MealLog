@@ -108,15 +108,6 @@
       </header>
 
       <div class="app-layout">
-        <aside class="desktop-sidebar" aria-label="メニュー">
-          <button class="side-nav active" type="button" data-side-action="home"><span>⌂</span><b>ホーム</b></button>
-          <button class="side-nav" type="button" data-side-action="meals"><span>🍴</span><b>食事の記録</b></button>
-          <button class="side-nav" type="button" data-side-action="stores"><span>▣</span><b>よく行く店</b></button>
-          <button class="side-nav" type="button" data-side-action="spend"><span>▤</span><b>食費の管理</b></button>
-          <button class="side-nav" type="button" data-side-action="stats"><span>▥</span><b>統計・レポート</b></button>
-          <button class="side-nav" type="button" data-side-action="favorite"><span>♡</span><b>お気に入り</b></button>
-          <button class="side-nav" type="button" data-side-action="settings"><span>⚙</span><b>設定</b></button>
-        </aside>
 
         <section class="main-stage">
           <section class="dashboard-panel">
@@ -127,7 +118,7 @@
             </div>
 
             <div class="place-section">
-              <div class="place-section-head"><h2><span>●</span> 食べた場所</h2><button id="clearPlaceFilterButton" class="clear-place active" type="button">すべて見る</button></div>
+              <div class="place-section-head"><h2><span>●</span> 食べた場所</h2><div class="place-head-actions"><button id="analysisButton" class="analysis-button place-analysis-button" type="button">分析</button><button id="clearPlaceFilterButton" class="clear-place active" type="button">すべて見る</button></div></div>
               <div class="place-buttons">
                 <button class="place-button home" type="button" data-place-filter="home"><span class="place-icon">⌂</span><strong>自宅</strong></button>
                 <button class="place-button dineout" type="button" data-place-filter="dineout"><span class="place-icon">♜</span><strong>外食</strong></button>

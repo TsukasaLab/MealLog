@@ -1,0 +1,315 @@
+/* MealLog Ver.0.25 - mobile/account/form/hero refinements */
+
+/* Hero uses a full scenic image instead of a cut-out mascot */
+.dashboard-panel{
+  padding-top:18px !important;
+}
+.hero-scene{
+  position:relative;
+  min-height:245px;
+  margin:-4px -4px 18px;
+  border:1px solid rgba(255,119,193,.28);
+  border-radius:28px;
+  overflow:hidden;
+  background:
+    linear-gradient(90deg,rgba(18,7,48,.34) 0%,rgba(18,7,48,.18) 48%,rgba(18,7,48,.04) 100%),
+    url('./assets/festival-cat-scene-v25.png') center 50% / cover no-repeat;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 14px 30px rgba(0,0,0,.18);
+}
+.hero-scene::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(180deg,transparent 42%,rgba(14,7,42,.16) 100%);
+}
+.hero-scene .search-row{
+  position:absolute !important;
+  left:22px;
+  right:42%;
+  bottom:22px;
+  z-index:3;
+  width:auto !important;
+  margin:0 !important;
+  grid-template-columns:minmax(0,1fr) 64px !important;
+}
+.hero-scene .search-field{
+  background:rgba(46,26,86,.82) !important;
+  border:1px solid rgba(255,129,204,.52) !important;
+  box-shadow:0 10px 28px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.06) !important;
+  backdrop-filter:blur(10px);
+}
+.hero-scene .search-run-button{
+  background:linear-gradient(145deg,#ff4f97,#ba3ec7) !important;
+  box-shadow:0 10px 24px rgba(214,58,160,.28),inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+.dashboard-mascot{display:none !important}
+
+/* Share action: always understandable, including mobile */
+.share-action{
+  min-width:84px !important;
+  width:auto !important;
+  padding:0 13px !important;
+  gap:7px !important;
+}
+.share-action .share-svg{
+  width:19px;
+  height:19px;
+  flex:0 0 19px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.share-action>b{
+  display:inline !important;
+  font-size:.76rem !important;
+  line-height:1;
+}
+
+/* Current Google account image, not a generic app icon when Google supplied one */
+.profile-action img[data-provider-avatar="google"]{
+  object-fit:cover !important;
+  background:#fff !important;
+}
+
+/* Place icons: unified home/car/bag visual language */
+.home-line-icon{
+  display:inline-grid !important;
+  place-items:center;
+}
+.home-line-icon svg{
+  width:1.45em;
+  height:1.45em;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.place-button .place-icon{
+  width:38px;
+  height:38px;
+  display:grid;
+  place-items:center;
+  font-size:1.35rem !important;
+}
+.place-button.home .place-icon{color:#fff}
+.place-button.home.active .place-icon{color:#ed3d72}
+
+/* Recent meals header: one clean row, list button stays at far right */
+.recent-heading{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:14px !important;
+}
+.recent-heading-copy{min-width:0;flex:1 1 auto}
+.recent-heading h2{white-space:nowrap !important;word-break:keep-all !important}
+.recent-heading .view-tools{
+  margin-left:auto !important;
+  align-self:center !important;
+  flex:0 0 auto !important;
+}
+
+/* Entry form: same 3-button design everywhere */
+#mealForm .choice-pills{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+#mealForm .choice-pills label{min-width:0}
+#mealForm .choice-pills label>input{position:absolute;opacity:0;pointer-events:none}
+#mealForm .choice-pills .place-choice{
+  min-height:58px !important;
+  padding:7px 10px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:9px !important;
+  border:2px solid rgba(255,255,255,.13) !important;
+  border-radius:18px !important;
+  background:linear-gradient(145deg,#342255,#21163d) !important;
+  color:#fff !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04) !important;
+}
+#mealForm .choice-pills input:checked + .place-choice{
+  background:linear-gradient(145deg,#fff5f8,#ffdeea) !important;
+  border-color:#ff6f9d !important;
+  color:#e83a70 !important;
+  box-shadow:0 8px 18px rgba(255,72,130,.16),inset 0 1px 0 rgba(255,255,255,.8) !important;
+}
+.place-choice-icon{
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  flex:0 0 30px;
+  font-size:1.32rem;
+}
+.place-choice strong{
+  font-size:.82rem;
+  white-space:nowrap;
+  word-break:keep-all;
+}
+
+/* Date then price. The two boxes stay perfectly aligned. */
+.date-price-row{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px 12px;
+  align-items:start;
+}
+.date-price-row>label{
+  display:grid;
+  grid-template-rows:auto 46px;
+  gap:4px;
+  min-width:0;
+}
+.date-price-row input{
+  height:46px !important;
+  min-height:46px !important;
+  box-sizing:border-box;
+}
+.price-row-note{
+  grid-column:1/-1;
+  margin-top:-2px;
+  color:#bfb0cd;
+  font-size:.64rem;
+  line-height:1.35;
+}
+.price-input-wrap{height:46px}
+.price-input-wrap input{height:100% !important}
+
+/* No expandable 'details' section; share + memo are ordinary fields */
+.always-visible-detail{display:grid !important}
+.advanced-fields{display:none !important}
+
+/* Meal modal: header/close and save never move with center scroll */
+#mealForm.modal-card{
+  height:min(760px,calc(100dvh - 12px)) !important;
+  max-height:calc(100dvh - 12px) !important;
+  grid-template-rows:auto minmax(0,1fr) auto !important;
+}
+#mealForm>.modal-header{
+  z-index:50 !important;
+  background:linear-gradient(180deg,#201045 0%,rgba(32,16,69,.98) 82%,rgba(32,16,69,.92) 100%) !important;
+  padding:6px 0 9px !important;
+}
+#mealForm #closeUpload{
+  position:sticky !important;
+  top:0 !important;
+  z-index:60 !important;
+}
+#mealForm .modal-scroll-body{
+  padding-right:4px !important;
+  scrollbar-width:thin;
+}
+#mealForm .modal-footer{
+  z-index:55 !important;
+  background:linear-gradient(180deg,rgba(20,11,53,.98),#12092f) !important;
+}
+#saveMeal{
+  width:min(330px,100%);
+  margin-left:auto;
+  border-radius:999px !important;
+  background:linear-gradient(135deg,#ff3d8c,#ff7666) !important;
+}
+
+/* Close button remains reachable in every scrollable modal */
+.share-card>.modal-header,
+.analysis-card>.modal-header{
+  position:sticky !important;
+  top:0 !important;
+  z-index:60 !important;
+  background:linear-gradient(180deg,rgba(30,17,69,.995),rgba(30,17,69,.94)) !important;
+}
+.detail-close{
+  position:sticky !important;
+  top:8px !important;
+  z-index:70 !important;
+}
+
+@media(max-width:760px){
+  .share-action{
+    display:inline-flex !important;
+    min-width:61px !important;
+    width:auto !important;
+    height:42px !important;
+    padding:0 9px !important;
+    border-radius:15px !important;
+  }
+  .share-action .share-svg{width:16px;height:16px;flex-basis:16px}
+  .share-action>b{font-size:.64rem !important}
+
+  .dashboard-panel{padding-top:10px !important}
+  .hero-scene{
+    min-height:210px;
+    margin:0 0 13px;
+    border-radius:22px;
+    background-position:58% 50%;
+  }
+  .hero-scene .search-row{
+    left:12px;
+    right:12px;
+    bottom:12px;
+    grid-template-columns:minmax(0,1fr) 52px !important;
+    gap:8px !important;
+  }
+  .hero-scene .search-field{min-height:54px !important;padding:0 14px !important;border-radius:21px !important}
+  .hero-scene .search-field input{font-size:.84rem !important}
+  .hero-scene .search-run-button{width:52px !important;height:54px !important;border-radius:17px !important}
+
+  /* all place controls remain 3 across */
+  .place-buttons,
+  #mealForm .choice-pills{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+  .place-button{
+    min-height:72px !important;
+    flex-direction:column !important;
+    gap:3px !important;
+  }
+  .place-button .place-icon{width:28px;height:28px;font-size:1.12rem !important}
+  .place-button strong{font-size:.68rem !important}
+  #mealForm .choice-pills .place-choice{
+    min-height:48px !important;
+    padding:5px 5px !important;
+    gap:4px !important;
+    border-radius:14px !important;
+  }
+  .place-choice-icon{width:24px;height:24px;flex-basis:24px;font-size:1.05rem}
+  .place-choice strong{font-size:.67rem}
+
+  .recent-heading{gap:8px !important}
+  .recent-heading .view-tools{margin-left:auto !important}
+  .recent-heading .view-all-button{min-width:72px}
+
+  /* Entry screen remains compact and no expandable row */
+  #mealForm.modal-card{
+    height:calc(100dvh - 8px) !important;
+    max-height:calc(100dvh - 8px) !important;
+  }
+  .date-price-row{
+    grid-template-columns:1fr 1fr !important;
+    gap:6px 8px !important;
+  }
+  .date-price-row>label{grid-template-rows:auto 42px;gap:3px}
+  .date-price-row input,.price-input-wrap{height:42px !important;min-height:42px !important}
+  .date-price-row input{font-size:.73rem !important;padding:7px 8px !important}
+  .price-input-wrap input{padding-right:32px !important}
+  .price-unit{right:10px !important;font-size:.74rem}
+  .price-row-note{font-size:.57rem}
+  #mealForm textarea{min-height:74px !important;max-height:90px !important}
+  .share-select-field small{font-size:.55rem !important}
+  #saveMeal{width:100%;min-width:0 !important}
+}
+
+@media(max-width:420px){
+  .share-action{min-width:54px !important;padding:0 7px !important}
+  .share-action>b{display:inline !important;font-size:.58rem !important}
+  .hero-scene{min-height:196px;background-position:60% 50%}
+  .date-price-row input{font-size:.68rem !important}
+  .place-choice strong{font-size:.61rem}
+}

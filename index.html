@@ -24,7 +24,9 @@
   <link rel="stylesheet" href="./v020.css?v=020" />
   <link rel="stylesheet" href="./v022.css?v=022" />
   <link rel="stylesheet" href="./v023.css?v=023" />
-  <link rel="manifest" href="./manifest.webmanifest?v=023" />
+  <link rel="stylesheet" href="./v024.css?v=024" />
+  <link rel="stylesheet" href="./v025.css?v=025" />
+  <link rel="manifest" href="./manifest.webmanifest?v=025" />
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
 </head>
@@ -34,7 +36,7 @@
   <section id="setupView" class="setup-view hidden">
     <div class="setup-card">
       <img class="brand-icon large" src="./icons/icon-192.png" alt="" aria-hidden="true" />
-      <p class="eyebrow">MealLog Ver.0.23</p>
+      <p class="eyebrow">MealLog Ver.0.25</p>
       <h1>Supabaseの接続設定が必要です</h1>
       <p><code>config.js</code> にProject URLとPublishable keyを設定してください。</p>
     </div>
@@ -99,7 +101,10 @@
           <div class="app-brand-copy"><strong>MealLog</strong><small>FESTIVAL FOOD MEMORY</small></div>
         </div>
         <div class="app-header-actions">
-          <button id="shareButtonTop" class="round-action share-action" type="button" aria-label="共有"><span aria-hidden="true">↗</span><b>共有</b></button>
+          <button id="shareButtonTop" class="round-action share-action" type="button" aria-label="共有する">
+            <svg class="share-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a3 3 0 1 0-2.83-4A3 3 0 0 0 18 8ZM6 15a3 3 0 1 0 2.83 4A3 3 0 0 0 6 15Zm12 1a3 3 0 1 0 2.83 4A3 3 0 0 0 18 16ZM8.6 16.1l6.8 3.8M15.4 6.1 8.6 9.9"/></svg>
+            <b>共有</b>
+          </button>
           <button id="openUploadTop" class="record-button" type="button"><span>＋</span><strong>記録する</strong></button>
           <button id="profileButton" class="profile-action" type="button" aria-label="アカウントメニュー"><img id="profileAvatar" src="./icons/icon-192.png" alt="アカウント" referrerpolicy="no-referrer" /><span id="avatarText" class="visually-hidden">M</span></button>
         </div>
@@ -107,28 +112,20 @@
       </header>
 
       <div class="app-layout">
-        <aside class="desktop-sidebar" aria-label="メニュー">
-          <button class="side-nav active" type="button" data-side-action="home"><span>⌂</span><b>ホーム</b></button>
-          <button class="side-nav" type="button" data-side-action="meals"><span>🍴</span><b>食事の記録</b></button>
-          <button class="side-nav" type="button" data-side-action="stores"><span>▣</span><b>よく行く店</b></button>
-          <button class="side-nav" type="button" data-side-action="spend"><span>▤</span><b>食費の管理</b></button>
-          <button class="side-nav" type="button" data-side-action="stats"><span>▥</span><b>統計・レポート</b></button>
-          <button class="side-nav" type="button" data-side-action="favorite"><span>♡</span><b>お気に入り</b></button>
-          <button class="side-nav" type="button" data-side-action="settings"><span>⚙</span><b>設定</b></button>
-        </aside>
 
         <section class="main-stage">
           <section class="dashboard-panel">
-            <div class="dashboard-mascot" aria-hidden="true"><img src="./assets/mascot-hero.png" alt="" /></div>
-            <div class="search-row">
-              <label class="search-field"><span>⌕</span><input id="heroSearchInput" type="search" placeholder="食事・お店・タグで検索…" /></label>
-              <button id="heroRefreshButton" class="filter-button search-run-button" type="button" aria-label="検索を実行"><span aria-hidden="true">→</span></button>
+            <div class="hero-scene" aria-label="夜桜祭りの屋台">
+              <div class="search-row">
+                <label class="search-field"><span>⌕</span><input id="heroSearchInput" type="search" placeholder="食事・お店・タグで検索…" /></label>
+                <button id="heroRefreshButton" class="filter-button search-run-button" type="button" aria-label="検索を実行"><span aria-hidden="true">→</span></button>
+              </div>
             </div>
 
             <div class="place-section">
-              <div class="place-section-head"><h2><span>●</span> 食べた場所</h2><button id="clearPlaceFilterButton" class="clear-place active" type="button">すべて見る</button></div>
+              <div class="place-section-head"><h2><span>●</span> 食べた場所</h2><div class="place-head-actions"><button id="analysisButton" class="analysis-button place-analysis-button" type="button">分析</button><button id="clearPlaceFilterButton" class="clear-place active" type="button">すべて見る</button></div></div>
               <div class="place-buttons">
-                <button class="place-button home" type="button" data-place-filter="home"><span class="place-icon">⌂</span><strong>自宅</strong></button>
+                <button class="place-button home" type="button" data-place-filter="home"><span class="place-icon home-line-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 10.5 12 3.5l8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1v-9Z"/></svg></span><strong>自宅</strong></button>
                 <button class="place-button dineout" type="button" data-place-filter="dineout"><span class="place-icon">🚗</span><strong>外食</strong></button>
                 <button class="place-button takeout" type="button" data-place-filter="takeout"><span class="place-icon">🛍️</span><strong>テイクアウト</strong></button>
               </div>
@@ -151,7 +148,7 @@
           </section>
 
           <section id="recentMealsSection" class="recent-panel">
-            <div class="recent-heading"><div class="recent-heading-copy"><p>RECENT MEALS</p><h2><span class="recent-icon" aria-hidden="true">🍴</span><span class="recent-title-text">最近の食事</span></h2></div><div class="view-tools"><input id="searchInput" type="search" hidden /><button id="analysisButton" class="analysis-button" type="button">分析</button><button id="refreshButton" class="view-all-button" type="button">すべて見る</button></div></div>
+            <div class="recent-heading"><div class="recent-heading-copy"><p>RECENT MEALS</p><h2><span class="recent-icon" aria-hidden="true">🍴</span><span class="recent-title-text">最近の食事</span></h2></div><div class="view-tools"><input id="searchInput" type="search" hidden /><button id="refreshButton" class="view-all-button" type="button">すべて見る</button></div></div>
             <div id="loadingState" class="state-card hidden"><div class="spinner"></div><p>クラウドから読み込み中…</p></div>
             <div id="emptyState" class="empty-state hidden"><h3>まだ記録がありません</h3><p>最初の一皿を登録してみよう。</p><button id="openUploadEmpty" class="record-button compact" type="button">＋ 食事を記録</button></div>
             <div id="timeline" class="timeline-grid"></div>
@@ -188,17 +185,19 @@
         <div class="wide field-block compact-place-block">
           <span class="field-label">食べた場所</span>
           <div class="choice-pills" role="radiogroup" aria-label="食べた場所">
-            <label><input type="radio" name="placeType" value="home" checked /><span>自宅</span></label>
-            <label><input type="radio" name="placeType" value="dineout" /><span>外食</span></label>
-            <label><input type="radio" name="placeType" value="takeout" /><span>テイクアウト</span></label>
+            <label><input type="radio" name="placeType" value="home" checked /><span class="place-choice"><span class="place-choice-icon home-line-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 10.5 12 3.5l8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1v-9Z"/></svg></span><strong>自宅</strong></span></label>
+            <label><input type="radio" name="placeType" value="dineout" /><span class="place-choice"><span class="place-choice-icon">🚗</span><strong>外食</strong></span></label>
+            <label><input type="radio" name="placeType" value="takeout" /><span class="place-choice"><span class="place-choice-icon">🛍️</span><strong>テイクアウト</strong></span></label>
           </div>
         </div>
 
         <label id="storeNameField" class="wide hidden"><span>店舗名 <em>任意</em></span><input id="storeName" type="text" maxlength="120" placeholder="例：○○ラーメン 敦賀店" /></label>
 
-        <label class="price-field compact-half"><span>価格 <em>任意</em></span><span class="price-input-wrap"><input id="priceInput" type="number" min="0" step="1" inputmode="numeric" placeholder="980" /><span class="price-unit">円</span></span><small>店舗ごとの集計に使えます。</small></label>
-
-        <label class="compact-half"><span>日時</span><input id="eatenAt" type="datetime-local" required /></label>
+        <div class="wide date-price-row">
+          <label class="date-field"><span>日時</span><input id="eatenAt" type="datetime-local" required /></label>
+          <label class="price-field"><span>価格 <em>任意</em></span><span class="price-input-wrap"><input id="priceInput" type="number" min="0" step="1" inputmode="numeric" placeholder="980" /><span class="price-unit">円</span></span></label>
+          <small class="price-row-note">価格は店舗ごとの集計に使えます。</small>
+        </div>
 
         <div class="wide field-block rating-block compact-rating-block">
           <span class="field-label">評価 <em>任意</em></span>
@@ -215,17 +214,12 @@
           <input id="ratingInput" type="hidden" value="" />
         </div>
 
-        <details class="advanced-fields wide">
-          <summary>詳細を追加（共有・メモ）</summary>
-          <div class="advanced-fields-inner">
-            <label class="wide share-select-field">
-              <span>共有範囲</span>
-              <select id="shareGroupSelect"><option value="">自分だけ</option></select>
-              <small>共有グループを選ぶと、そのメンバーにも表示されます。</small>
-            </label>
-            <label class="wide"><span>メモ <em>任意</em></span><textarea id="mealNote" rows="3" maxlength="800" placeholder="おいしかったもの、また食べたいものなど"></textarea></label>
-          </div>
-        </details>
+        <label class="wide share-select-field always-visible-detail">
+          <span>共有範囲</span>
+          <select id="shareGroupSelect"><option value="">自分だけ</option></select>
+          <small>共有グループを選ぶと、そのメンバーにも表示されます。</small>
+        </label>
+        <label class="wide always-visible-detail"><span>メモ <em>任意</em></span><textarea id="mealNote" rows="3" maxlength="800" placeholder="おいしかったもの、また食べたいものなど"></textarea></label>
       </div>
 
       </div>
@@ -296,13 +290,13 @@
     </article>
   </dialog>
 
-  <script src="./config.js?v=023"></script>
+  <script src="./config.js?v=025"></script>
   <script>
     window.MEALLOG_CONFIG = window.MEALLOG_CONFIG || {
       SUPABASE_URL: "https://icgwnxppibsbiciuyvjg.supabase.co",
       SUPABASE_KEY: "sb_publishable_gzC7_Vxo4J0YJ-g-Psw0tw_gY8NF77M"
     };
   </script>
-  <script type="module" src="./app.js?v=023"></script>
+  <script type="module" src="./app.js?v=025"></script>
 </body>
 </html>

@@ -188,6 +188,28 @@ async function bootstrap() {
   supabase.auth.onAuthStateChange(async (_event, session) => applySession(session));
 }
 
+function resolveGoogleAvatar(user) {
+  if (!user) return '';
+  const meta = user.user_metadata || {};
+  const direct = meta.avatar_url || meta.picture || meta.photo_url || '';
+  if (direct) return direct;
+  const googleIdentity = (user.identities || []).find(identity => identity?.provider === 'google');
+  const identityData = googleIdentity?.identity_data || {};
+  return identityData.avatar_url || identityData.picture || '';
+}
+
+function normalizeAvatarUrl(url) {
+  if (!url) return '';
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname.includes('googleusercontent.com')) {
+      parsed.searchParams.set('sz', '128');
+      return parsed.toString();
+    }
+  } catch (_) {}
+  return url;
+}
+
 async function applySession(session) {
   currentUser = session?.user || null;
   if (!currentUser) {
@@ -203,11 +225,13 @@ async function applySession(session) {
   els.profileEmail.style.whiteSpace = 'pre-line';
   els.avatarText.textContent = (displayName || email).slice(0, 1).toUpperCase();
   if (els.profileAvatar) {
-    const avatarUrl = currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || '';
+    const avatarUrl = normalizeAvatarUrl(resolveGoogleAvatar(currentUser));
     els.profileAvatar.src = avatarUrl || './icons/icon-192.png';
+    els.profileAvatar.dataset.providerAvatar = avatarUrl ? 'google' : 'fallback';
     els.profileAvatar.alt = displayName ? `${displayName}のプロフィール画像` : 'アカウント';
     els.profileAvatar.onerror = () => {
       els.profileAvatar.onerror = null;
+      els.profileAvatar.dataset.providerAvatar = 'fallback';
       els.profileAvatar.src = './icons/icon-192.png';
     };
   }
@@ -1237,7 +1261,7 @@ bootstrap();
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
-      const registration = await navigator.serviceWorker.register('./sw.js?v=023');
+      const registration = await navigator.serviceWorker.register('./sw.js?v=025');
       await registration.update();
     } catch (error) {
       console.error('ServiceWorker registration failed', error);

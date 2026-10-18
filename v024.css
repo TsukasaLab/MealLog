@@ -1,0 +1,55 @@
+/* MealLog Ver.0.24 - layout cleanup */
+
+/* Sidebar removed: use the full content width */
+.app-layout{
+  display:block !important;
+}
+.main-stage{
+  width:100% !important;
+  min-width:0 !important;
+}
+
+/* Top-right actions in the place section */
+.place-section-head{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:14px !important;
+}
+.place-head-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:0 0 auto;
+}
+.place-analysis-button{
+  min-height:38px !important;
+  padding:0 14px !important;
+  font-size:.78rem !important;
+}
+
+/* Recent section has only the list action now */
+.recent-heading .view-tools{
+  margin-left:auto;
+}
+
+/* Without the sidebar, use the wider desktop space cleanly */
+.dashboard-panel,
+.recent-panel{
+  width:100% !important;
+}
+
+@media (max-width:700px){
+  .place-section-head{
+    gap:8px !important;
+  }
+  .place-head-actions{
+    gap:6px;
+  }
+  .place-analysis-button,
+  .clear-place{
+    min-height:34px !important;
+    padding:0 10px !important;
+    font-size:.65rem !important;
+  }
+}
